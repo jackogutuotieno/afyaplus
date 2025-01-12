@@ -23,14 +23,14 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
-            ["opd_total_bill", [fields.opd_total_bill.visible && fields.opd_total_bill.required ? ew.Validators.required(fields.opd_total_bill.caption) : null, ew.Validators.float], fields.opd_total_bill.isInvalid]
+            ["total_bll", [fields.total_bll.visible && fields.total_bll.required ? ew.Validators.required(fields.total_bll.caption) : null, ew.Validators.float], fields.total_bll.isInvalid]
         ])
 
         // Check empty row
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["opd_total_bill",false]];
+                    fields = [["total_bll",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -84,8 +84,8 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
-<?php if ($Grid->opd_total_bill->Visible) { // opd_total_bill ?>
-        <th data-name="opd_total_bill" class="<?= $Grid->opd_total_bill->headerCellClass() ?>"><div id="elh_opd_bill_total_opd_total_bill" class="opd_bill_total_opd_total_bill"><?= $Grid->renderFieldHeader($Grid->opd_total_bill) ?></div></th>
+<?php if ($Grid->total_bll->Visible) { // total_bll ?>
+        <th data-name="total_bll" class="<?= $Grid->total_bll->headerCellClass() ?>"><div id="elh_opd_bill_total_total_bll" class="opd_bill_total_total_bll"><?= $Grid->renderFieldHeader($Grid->total_bll) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -123,29 +123,29 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
-    <?php if ($Grid->opd_total_bill->Visible) { // opd_total_bill ?>
-        <td data-name="opd_total_bill"<?= $Grid->opd_total_bill->cellAttributes() ?>>
+    <?php if ($Grid->total_bll->Visible) { // total_bll ?>
+        <td data-name="total_bll"<?= $Grid->total_bll->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_bill_total_opd_total_bill" class="el_opd_bill_total_opd_total_bill">
-<input type="<?= $Grid->opd_total_bill->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_opd_total_bill" id="x<?= $Grid->RowIndex ?>_opd_total_bill" data-table="opd_bill_total" data-field="x_opd_total_bill" value="<?= $Grid->opd_total_bill->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->opd_total_bill->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->opd_total_bill->formatPattern()) ?>"<?= $Grid->opd_total_bill->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->opd_total_bill->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_bill_total_total_bll" class="el_opd_bill_total_total_bll">
+<input type="<?= $Grid->total_bll->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_total_bll" id="x<?= $Grid->RowIndex ?>_total_bll" data-table="opd_bill_total" data-field="x_total_bll" value="<?= $Grid->total_bll->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->total_bll->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->total_bll->formatPattern()) ?>"<?= $Grid->total_bll->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->total_bll->getErrorMessage() ?></div>
 </span>
-<input type="hidden" data-table="opd_bill_total" data-field="x_opd_total_bill" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_opd_total_bill" id="o<?= $Grid->RowIndex ?>_opd_total_bill" value="<?= HtmlEncode($Grid->opd_total_bill->OldValue) ?>">
+<input type="hidden" data-table="opd_bill_total" data-field="x_total_bll" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_total_bll" id="o<?= $Grid->RowIndex ?>_total_bll" value="<?= HtmlEncode($Grid->total_bll->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_bill_total_opd_total_bill" class="el_opd_bill_total_opd_total_bill">
-<input type="<?= $Grid->opd_total_bill->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_opd_total_bill" id="x<?= $Grid->RowIndex ?>_opd_total_bill" data-table="opd_bill_total" data-field="x_opd_total_bill" value="<?= $Grid->opd_total_bill->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->opd_total_bill->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->opd_total_bill->formatPattern()) ?>"<?= $Grid->opd_total_bill->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->opd_total_bill->getErrorMessage() ?></div>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_bill_total_total_bll" class="el_opd_bill_total_total_bll">
+<input type="<?= $Grid->total_bll->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_total_bll" id="x<?= $Grid->RowIndex ?>_total_bll" data-table="opd_bill_total" data-field="x_total_bll" value="<?= $Grid->total_bll->EditValue ?>" size="30" placeholder="<?= HtmlEncode($Grid->total_bll->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->total_bll->formatPattern()) ?>"<?= $Grid->total_bll->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->total_bll->getErrorMessage() ?></div>
 </span>
 <?php } ?>
 <?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_bill_total_opd_total_bill" class="el_opd_bill_total_opd_total_bill">
-<span<?= $Grid->opd_total_bill->viewAttributes() ?>>
-<?= $Grid->opd_total_bill->getViewValue() ?></span>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_bill_total_total_bll" class="el_opd_bill_total_total_bll">
+<span<?= $Grid->total_bll->viewAttributes() ?>>
+<?= $Grid->total_bll->getViewValue() ?></span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="opd_bill_total" data-field="x_opd_total_bill" data-hidden="1" name="fopd_bill_totalgrid$x<?= $Grid->RowIndex ?>_opd_total_bill" id="fopd_bill_totalgrid$x<?= $Grid->RowIndex ?>_opd_total_bill" value="<?= HtmlEncode($Grid->opd_total_bill->FormValue) ?>">
-<input type="hidden" data-table="opd_bill_total" data-field="x_opd_total_bill" data-hidden="1" data-old name="fopd_bill_totalgrid$o<?= $Grid->RowIndex ?>_opd_total_bill" id="fopd_bill_totalgrid$o<?= $Grid->RowIndex ?>_opd_total_bill" value="<?= HtmlEncode($Grid->opd_total_bill->OldValue) ?>">
+<input type="hidden" data-table="opd_bill_total" data-field="x_total_bll" data-hidden="1" name="fopd_bill_totalgrid$x<?= $Grid->RowIndex ?>_total_bll" id="fopd_bill_totalgrid$x<?= $Grid->RowIndex ?>_total_bll" value="<?= HtmlEncode($Grid->total_bll->FormValue) ?>">
+<input type="hidden" data-table="opd_bill_total" data-field="x_total_bll" data-hidden="1" data-old name="fopd_bill_totalgrid$o<?= $Grid->RowIndex ?>_total_bll" id="fopd_bill_totalgrid$o<?= $Grid->RowIndex ?>_total_bll" value="<?= HtmlEncode($Grid->total_bll->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>

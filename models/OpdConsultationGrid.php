@@ -137,7 +137,6 @@ class OpdConsultationGrid extends OpdConsultation
     public function setVisibility()
     {
         $this->visit_id->setVisibility();
-        $this->item_title->setVisibility();
         $this->cost->setVisibility();
     }
 
@@ -1090,14 +1089,6 @@ class OpdConsultationGrid extends OpdConsultation
             return false;
         }
         if (
-            $CurrentForm->hasValue("x_item_title") &&
-            $CurrentForm->hasValue("o_item_title") &&
-            $this->item_title->CurrentValue != $this->item_title->DefaultValue &&
-            !($this->item_title->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->item_title->CurrentValue == $this->item_title->getSessionValue())
-        ) {
-            return false;
-        }
-        if (
             $CurrentForm->hasValue("x_cost") &&
             $CurrentForm->hasValue("o_cost") &&
             $this->cost->CurrentValue != $this->cost->DefaultValue &&
@@ -1584,19 +1575,6 @@ class OpdConsultationGrid extends OpdConsultation
             $this->visit_id->setOldValue($CurrentForm->getValue("o_visit_id"));
         }
 
-        // Check field name 'item_title' first before field var 'x_item_title'
-        $val = $CurrentForm->hasValue("item_title") ? $CurrentForm->getValue("item_title") : $CurrentForm->getValue("x_item_title");
-        if (!$this->item_title->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->item_title->Visible = false; // Disable update for API request
-            } else {
-                $this->item_title->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_item_title")) {
-            $this->item_title->setOldValue($CurrentForm->getValue("o_item_title"));
-        }
-
         // Check field name 'cost' first before field var 'x_cost'
         $val = $CurrentForm->hasValue("cost") ? $CurrentForm->getValue("cost") : $CurrentForm->getValue("x_cost");
         if (!$this->cost->IsDetailKey) {
@@ -1616,7 +1594,6 @@ class OpdConsultationGrid extends OpdConsultation
     {
         global $CurrentForm;
         $this->visit_id->CurrentValue = $this->visit_id->FormValue;
-        $this->item_title->CurrentValue = $this->item_title->FormValue;
         $this->cost->CurrentValue = $this->cost->FormValue;
     }
 
@@ -1714,7 +1691,6 @@ class OpdConsultationGrid extends OpdConsultation
         // Call Row Selected event
         $this->rowSelected($row);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->item_title->setDbValue($row['item_title']);
         $this->cost->setDbValue($row['cost']);
     }
 
@@ -1723,7 +1699,6 @@ class OpdConsultationGrid extends OpdConsultation
     {
         $row = [];
         $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
         return $row;
     }
@@ -1753,8 +1728,6 @@ class OpdConsultationGrid extends OpdConsultation
 
         // visit_id
 
-        // item_title
-
         // cost
 
         // Accumulate aggregate value
@@ -1770,9 +1743,6 @@ class OpdConsultationGrid extends OpdConsultation
             $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
             $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
-
             // cost
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
@@ -1780,10 +1750,6 @@ class OpdConsultationGrid extends OpdConsultation
             // visit_id
             $this->visit_id->HrefValue = "";
             $this->visit_id->TooltipValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-            $this->item_title->TooltipValue = "";
 
             // cost
             $this->cost->HrefValue = "";
@@ -1804,14 +1770,6 @@ class OpdConsultationGrid extends OpdConsultation
                 }
             }
 
-            // item_title
-            $this->item_title->setupEditAttributes();
-            if (!$this->item_title->Raw) {
-                $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
-            }
-            $this->item_title->EditValue = HtmlEncode($this->item_title->CurrentValue);
-            $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
-
             // cost
             $this->cost->setupEditAttributes();
             $this->cost->EditValue = $this->cost->CurrentValue;
@@ -1824,9 +1782,6 @@ class OpdConsultationGrid extends OpdConsultation
 
             // visit_id
             $this->visit_id->HrefValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
 
             // cost
             $this->cost->HrefValue = "";
@@ -1846,14 +1801,6 @@ class OpdConsultationGrid extends OpdConsultation
                 }
             }
 
-            // item_title
-            $this->item_title->setupEditAttributes();
-            if (!$this->item_title->Raw) {
-                $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
-            }
-            $this->item_title->EditValue = HtmlEncode($this->item_title->CurrentValue);
-            $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
-
             // cost
             $this->cost->setupEditAttributes();
             $this->cost->EditValue = $this->cost->CurrentValue;
@@ -1866,9 +1813,6 @@ class OpdConsultationGrid extends OpdConsultation
 
             // visit_id
             $this->visit_id->HrefValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
 
             // cost
             $this->cost->HrefValue = "";
@@ -1907,11 +1851,6 @@ class OpdConsultationGrid extends OpdConsultation
             }
             if (!CheckInteger($this->visit_id->FormValue)) {
                 $this->visit_id->addErrorMessage($this->visit_id->getErrorMessage(false));
-            }
-            if ($this->item_title->Visible && $this->item_title->Required) {
-                if (!$this->item_title->IsDetailKey && EmptyValue($this->item_title->FormValue)) {
-                    $this->item_title->addErrorMessage(str_replace("%s", $this->item_title->caption(), $this->item_title->RequiredErrorMessage));
-                }
             }
             if ($this->cost->Visible && $this->cost->Required) {
                 if (!$this->cost->IsDetailKey && EmptyValue($this->cost->FormValue)) {
@@ -2073,9 +2012,6 @@ class OpdConsultationGrid extends OpdConsultation
         }
         $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, $this->visit_id->ReadOnly);
 
-        // item_title
-        $this->item_title->setDbValueDef($rsnew, $this->item_title->CurrentValue, $this->item_title->ReadOnly);
-
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, $this->cost->ReadOnly);
         return $rsnew;
@@ -2089,9 +2025,6 @@ class OpdConsultationGrid extends OpdConsultation
     {
         if (isset($row['visit_id'])) { // visit_id
             $this->visit_id->CurrentValue = $row['visit_id'];
-        }
-        if (isset($row['item_title'])) { // item_title
-            $this->item_title->CurrentValue = $row['item_title'];
         }
         if (isset($row['cost'])) { // cost
             $this->cost->CurrentValue = $row['cost'];
@@ -2158,9 +2091,6 @@ class OpdConsultationGrid extends OpdConsultation
         // visit_id
         $this->visit_id->setDbValueDef($rsnew, $this->visit_id->CurrentValue, false);
 
-        // item_title
-        $this->item_title->setDbValueDef($rsnew, $this->item_title->CurrentValue, false);
-
         // cost
         $this->cost->setDbValueDef($rsnew, $this->cost->CurrentValue, false);
         return $rsnew;
@@ -2174,9 +2104,6 @@ class OpdConsultationGrid extends OpdConsultation
     {
         if (isset($row['visit_id'])) { // visit_id
             $this->visit_id->setFormValue($row['visit_id']);
-        }
-        if (isset($row['item_title'])) { // item_title
-            $this->item_title->setFormValue($row['item_title']);
         }
         if (isset($row['cost'])) { // cost
             $this->cost->setFormValue($row['cost']);

@@ -200,20 +200,20 @@ loadjs.ready("head", function () {
 <?php include_once "OpdLabMasterBillGrid.php" ?>
 <?php } ?>
 <?php
-    if (in_array("opd_radiology_master_bill", explode(",", $Page->getCurrentDetailTable())) && $opd_radiology_master_bill->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("opd_radiology_master_bill", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "OpdRadiologyMasterBillGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("opd_pharmacy_master_bill", explode(",", $Page->getCurrentDetailTable())) && $opd_pharmacy_master_bill->DetailView) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("opd_pharmacy_master_bill", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "OpdPharmacyMasterBillGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("opd_bill_total", explode(",", $Page->getCurrentDetailTable())) && $opd_bill_total->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("opd_bill_total", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "OpdBillTotalGrid.php" ?>
 <?php } ?>
 </form>
 <script class="ew-apply-template">

@@ -58,6 +58,7 @@ class DoctorNotes extends DbTable
     public $id;
     public $patient_id;
     public $visit_id;
+    public $service_id;
     public $chief_complaint;
     public $history_of_presenting_illness;
     public $past_medical_history;
@@ -197,6 +198,33 @@ class DoctorNotes extends DbTable
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
+
+        // service_id
+        $this->service_id = new DbField(
+            $this, // Table
+            'x_service_id', // Variable name
+            'service_id', // Name
+            '`service_id`', // Expression
+            '`service_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`service_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->service_id->addMethod("getDefault", fn() => 1);
+        $this->service_id->InputTextType = "text";
+        $this->service_id->Raw = true;
+        $this->service_id->Nullable = false; // NOT NULL field
+        $this->service_id->Sortable = false; // Allow sort
+        $this->service_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->service_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['service_id'] = &$this->service_id;
 
         // chief_complaint
         $this->chief_complaint = new DbField(
@@ -1042,6 +1070,7 @@ class DoctorNotes extends DbTable
         $this->id->DbValue = $row['id'];
         $this->patient_id->DbValue = $row['patient_id'];
         $this->visit_id->DbValue = $row['visit_id'];
+        $this->service_id->DbValue = $row['service_id'];
         $this->chief_complaint->DbValue = $row['chief_complaint'];
         $this->history_of_presenting_illness->DbValue = $row['history_of_presenting_illness'];
         $this->past_medical_history->DbValue = $row['past_medical_history'];
@@ -1410,6 +1439,7 @@ class DoctorNotes extends DbTable
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
+        $this->service_id->setDbValue($row['service_id']);
         $this->chief_complaint->setDbValue($row['chief_complaint']);
         $this->history_of_presenting_illness->setDbValue($row['history_of_presenting_illness']);
         $this->past_medical_history->setDbValue($row['past_medical_history']);
@@ -1454,6 +1484,9 @@ class DoctorNotes extends DbTable
 
         // visit_id
         $this->visit_id->CellCssStyle = "white-space: nowrap;";
+
+        // service_id
+        $this->service_id->CellCssStyle = "white-space: nowrap;";
 
         // chief_complaint
 
@@ -1501,6 +1534,10 @@ class DoctorNotes extends DbTable
         // visit_id
         $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
         $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
+
+        // service_id
+        $this->service_id->ViewValue = $this->service_id->CurrentValue;
+        $this->service_id->ViewValue = FormatNumber($this->service_id->ViewValue, $this->service_id->formatPattern());
 
         // chief_complaint
         $this->chief_complaint->ViewValue = $this->chief_complaint->CurrentValue;
@@ -1559,6 +1596,10 @@ class DoctorNotes extends DbTable
         // visit_id
         $this->visit_id->HrefValue = "";
         $this->visit_id->TooltipValue = "";
+
+        // service_id
+        $this->service_id->HrefValue = "";
+        $this->service_id->TooltipValue = "";
 
         // chief_complaint
         $this->chief_complaint->HrefValue = "";
@@ -1653,6 +1694,11 @@ class DoctorNotes extends DbTable
                 $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
             }
         }
+
+        // service_id
+        $this->service_id->setupEditAttributes();
+        $this->service_id->EditValue = $this->service_id->CurrentValue;
+        $this->service_id->EditValue = FormatNumber($this->service_id->EditValue, $this->service_id->formatPattern());
 
         // chief_complaint
         $this->chief_complaint->setupEditAttributes();

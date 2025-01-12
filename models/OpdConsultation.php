@@ -48,7 +48,6 @@ class OpdConsultation extends DbTable
 
     // Fields
     public $visit_id;
-    public $item_title;
     public $cost;
 
     // Page ID
@@ -122,30 +121,6 @@ class OpdConsultation extends DbTable
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->visit_id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['visit_id'] = &$this->visit_id;
-
-        // item_title
-        $this->item_title = new DbField(
-            $this, // Table
-            'x_item_title', // Variable name
-            'item_title', // Name
-            '`item_title`', // Expression
-            '`item_title`', // Basic search expression
-            200, // Type
-            100, // Size
-            -1, // Date/Time format
-            false, // Is upload field
-            '`item_title`', // Virtual expression
-            false, // Is virtual
-            false, // Force selection
-            false, // Is Virtual search
-            'FORMATTED TEXT', // View Tag
-            'TEXT' // Edit Tag
-        );
-        $this->item_title->InputTextType = "text";
-        $this->item_title->Nullable = false; // NOT NULL field
-        $this->item_title->Required = true; // Required field
-        $this->item_title->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
-        $this->Fields['item_title'] = &$this->item_title;
 
         // cost
         $this->cost = new DbField(
@@ -762,7 +737,6 @@ class OpdConsultation extends DbTable
             return;
         }
         $this->visit_id->DbValue = $row['visit_id'];
-        $this->item_title->DbValue = $row['item_title'];
         $this->cost->DbValue = $row['cost'];
     }
 
@@ -1076,7 +1050,6 @@ class OpdConsultation extends DbTable
             return;
         }
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->item_title->setDbValue($row['item_title']);
         $this->cost->setDbValue($row['cost']);
     }
 
@@ -1110,16 +1083,11 @@ class OpdConsultation extends DbTable
 
         // visit_id
 
-        // item_title
-
         // cost
 
         // visit_id
         $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
         $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
-
-        // item_title
-        $this->item_title->ViewValue = $this->item_title->CurrentValue;
 
         // cost
         $this->cost->ViewValue = $this->cost->CurrentValue;
@@ -1128,10 +1096,6 @@ class OpdConsultation extends DbTable
         // visit_id
         $this->visit_id->HrefValue = "";
         $this->visit_id->TooltipValue = "";
-
-        // item_title
-        $this->item_title->HrefValue = "";
-        $this->item_title->TooltipValue = "";
 
         // cost
         $this->cost->HrefValue = "";
@@ -1165,14 +1129,6 @@ class OpdConsultation extends DbTable
                 $this->visit_id->EditValue = FormatNumber($this->visit_id->EditValue, null);
             }
         }
-
-        // item_title
-        $this->item_title->setupEditAttributes();
-        if (!$this->item_title->Raw) {
-            $this->item_title->CurrentValue = HtmlDecode($this->item_title->CurrentValue);
-        }
-        $this->item_title->EditValue = $this->item_title->CurrentValue;
-        $this->item_title->PlaceHolder = RemoveHtml($this->item_title->caption());
 
         // cost
         $this->cost->setupEditAttributes();
@@ -1219,11 +1175,9 @@ class OpdConsultation extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->item_title);
                     $doc->exportCaption($this->cost);
                 } else {
                     $doc->exportCaption($this->visit_id);
-                    $doc->exportCaption($this->item_title);
                     $doc->exportCaption($this->cost);
                 }
                 $doc->endExportRow();
@@ -1253,11 +1207,9 @@ class OpdConsultation extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->visit_id);
-                        $doc->exportField($this->item_title);
                         $doc->exportField($this->cost);
                     } else {
                         $doc->exportField($this->visit_id);
-                        $doc->exportField($this->item_title);
                         $doc->exportField($this->cost);
                     }
                     $doc->endExportRow($rowCnt);
@@ -1278,7 +1230,6 @@ class OpdConsultation extends DbTable
             if (!$doc->ExportCustom) {
                 $doc->beginExportRow(-1);
                 $doc->exportAggregate($this->visit_id, '');
-                $doc->exportAggregate($this->item_title, '');
                 $doc->exportAggregate($this->cost, 'TOTAL');
                 $doc->endExportRow();
             }

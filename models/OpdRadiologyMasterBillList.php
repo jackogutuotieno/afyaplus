@@ -698,9 +698,6 @@ class OpdRadiologyMasterBillList extends OpdRadiologyMasterBill
             $this->InlineDelete = true;
         }
 
-        // Set up master detail parameters
-        $this->setupMasterParms();
-
         // Setup other options
         $this->setupOtherOptions();
 
@@ -837,28 +834,8 @@ class OpdRadiologyMasterBillList extends OpdRadiologyMasterBill
         if (!$Security->canList()) {
             $this->Filter = "(0=1)"; // Filter all records
         }
-
-        // Restore master/detail filter from session
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Restore master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Restore detail filter from session
         AddFilter($this->Filter, $this->DbDetailFilter);
         AddFilter($this->Filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "opd_bill_master_report") {
-            $masterTbl = Container("opd_bill_master_report");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetchAssociative();
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("opdbillmasterreportlist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = RowType::MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Set up filter
         if ($this->Command == "json") {
@@ -1268,14 +1245,6 @@ class OpdRadiologyMasterBillList extends OpdRadiologyMasterBill
             // Reset search criteria
             if ($this->Command == "reset" || $this->Command == "resetall") {
                 $this->resetSearchParms();
-            }
-
-            // Reset master/detail keys
-            if ($this->Command == "resetall") {
-                $this->setCurrentMasterTable(""); // Clear master table
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-                        $this->visit_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -2183,23 +2152,6 @@ class OpdRadiologyMasterBillList extends OpdRadiologyMasterBill
         // Call Page Exporting server event
         $doc->ExportCustom = !$this->pageExporting($doc);
 
-        // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->DbMasterFilter != "" && $this->getCurrentMasterTable() == "opd_bill_master_report") {
-            $opd_bill_master_report = new OpdBillMasterReportList();
-            $rsmaster = $opd_bill_master_report->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->setTable($opd_bill_master_report);
-                    $opd_bill_master_report->exportDocument($doc, $rsmaster);
-                    $doc->exportEmptyRow();
-                    $doc->setTable($this);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Page header
         $header = $this->PageHeader;
         $this->pageDataRendering($header);
@@ -2217,90 +2169,6 @@ class OpdRadiologyMasterBillList extends OpdRadiologyMasterBill
 
         // Call Page Exported server event
         $this->pageExported($doc);
-    }
-
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        $foreignKeys = [];
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "opd_bill_master_report") {
-                $validMaster = true;
-                $masterTbl = Container("opd_bill_master_report");
-                if (($parm = Get("fk_id", Get("visit_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->visit_id->QueryStringValue = $masterTbl->id->QueryStringValue; // DO NOT change, master/detail key data type can be different
-                    $this->visit_id->setSessionValue($this->visit_id->QueryStringValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->QueryStringValue;
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "opd_bill_master_report") {
-                $validMaster = true;
-                $masterTbl = Container("opd_bill_master_report");
-                if (($parm = Post("fk_id", Post("visit_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->visit_id->FormValue = $masterTbl->id->FormValue;
-                    $this->visit_id->setSessionValue($this->visit_id->FormValue);
-                    $foreignKeys["visit_id"] = $this->visit_id->FormValue;
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Update URL
-            $this->AddUrl = $this->addMasterUrl($this->AddUrl);
-            $this->InlineAddUrl = $this->addMasterUrl($this->InlineAddUrl);
-            $this->GridAddUrl = $this->addMasterUrl($this->GridAddUrl);
-            $this->GridEditUrl = $this->addMasterUrl($this->GridEditUrl);
-            $this->MultiEditUrl = $this->addMasterUrl($this->MultiEditUrl);
-
-            // Set up Breadcrumb
-            if (!$this->isExport()) {
-                $this->setupBreadcrumb(); // Set up breadcrumb again for the master table
-            }
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit() && !$this->isGridUpdate()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "opd_bill_master_report") {
-                if (!array_key_exists("visit_id", $foreignKeys)) { // Not current foreign key
-                    $this->visit_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilterFromSession(); // Get master filter from session
-        $this->DbDetailFilter = $this->getDetailFilterFromSession(); // Get detail filter from session
     }
 
     // Set up Breadcrumb

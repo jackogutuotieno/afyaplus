@@ -147,7 +147,6 @@ class OpdConsultationList extends OpdConsultation
     public function setVisibility()
     {
         $this->visit_id->setVisibility();
-        $this->item_title->setVisibility();
         $this->cost->setVisibility();
     }
 
@@ -767,33 +766,8 @@ class OpdConsultationList extends OpdConsultation
             $this->OtherOptions->hideAllOptions();
         }
 
-        // Get default search criteria
-        AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
-
-        // Get basic search values
-        $this->loadBasicSearchValues();
-
-        // Process filter list
-        if ($this->processFilterList()) {
-            $this->terminate();
-            return;
-        }
-
-        // Restore search parms from Session if not searching / reset / export
-        if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
-            $this->restoreSearchParms();
-        }
-
-        // Call Recordset SearchValidated event
-        $this->recordsetSearchValidated();
-
         // Set up sorting order
         $this->setupSortOrder();
-
-        // Get basic search criteria
-        if (!$this->hasInvalidFields()) {
-            $srchBasic = $this->basicSearchWhere();
-        }
 
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
@@ -801,35 +775,6 @@ class OpdConsultationList extends OpdConsultation
         } else {
             $this->DisplayRecords = 5; // Load default
             $this->setRecordsPerPage($this->DisplayRecords); // Save default to Session
-        }
-
-        // Load search default if no existing search criteria
-        if (!$this->checkSearchParms() && !$query) {
-            // Load basic search from default
-            $this->BasicSearch->loadDefault();
-            if ($this->BasicSearch->Keyword != "") {
-                $srchBasic = $this->basicSearchWhere(); // Save to session
-            }
-        }
-
-        // Build search criteria
-        if ($query) {
-            AddFilter($this->SearchWhere, $query);
-        } else {
-            AddFilter($this->SearchWhere, $srchAdvanced);
-            AddFilter($this->SearchWhere, $srchBasic);
-        }
-
-        // Call Recordset_Searching event
-        $this->recordsetSearching($this->SearchWhere);
-
-        // Save search criteria
-        if ($this->Command == "search" && !$this->RestoreSearch) {
-            $this->setSearchWhere($this->SearchWhere); // Save to Session
-            $this->StartRecord = 1; // Reset start record counter
-            $this->setStartRecordNumber($this->StartRecord);
-        } elseif ($this->Command != "json" && !$query) {
-            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -1053,185 +998,6 @@ class OpdConsultationList extends OpdConsultation
         return $wrkFilter;
     }
 
-    // Get list of filters
-    public function getFilterList()
-    {
-        // Initialize
-        $filterList = "";
-        $savedFilterList = "";
-
-        // Load server side filters
-        if (Config("SEARCH_FILTER_OPTION") == "Server") {
-            $savedFilterList = Profile()->getSearchFilters("fopd_consultationsrch");
-        }
-        $filterList = Concat($filterList, $this->visit_id->AdvancedSearch->toJson(), ","); // Field visit_id
-        $filterList = Concat($filterList, $this->item_title->AdvancedSearch->toJson(), ","); // Field item_title
-        $filterList = Concat($filterList, $this->cost->AdvancedSearch->toJson(), ","); // Field cost
-        if ($this->BasicSearch->Keyword != "") {
-            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
-            $filterList = Concat($filterList, $wrk, ",");
-        }
-
-        // Return filter list in JSON
-        if ($filterList != "") {
-            $filterList = "\"data\":{" . $filterList . "}";
-        }
-        if ($savedFilterList != "") {
-            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
-        }
-        return ($filterList != "") ? "{" . $filterList . "}" : "null";
-    }
-
-    // Process filter list
-    protected function processFilterList()
-    {
-        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
-            $filters = Post("filters");
-            Profile()->setSearchFilters("fopd_consultationsrch", $filters);
-            WriteJson([["success" => true]]); // Success
-            return true;
-        } elseif (Post("cmd") == "resetfilter") {
-            $this->restoreFilterList();
-        }
-        return false;
-    }
-
-    // Restore list of filters
-    protected function restoreFilterList()
-    {
-        // Return if not reset filter
-        if (Post("cmd") !== "resetfilter") {
-            return false;
-        }
-        $filter = json_decode(Post("filter"), true);
-        $this->Command = "search";
-
-        // Field visit_id
-        $this->visit_id->AdvancedSearch->SearchValue = @$filter["x_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchOperator = @$filter["z_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchCondition = @$filter["v_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchValue2 = @$filter["y_visit_id"];
-        $this->visit_id->AdvancedSearch->SearchOperator2 = @$filter["w_visit_id"];
-        $this->visit_id->AdvancedSearch->save();
-
-        // Field item_title
-        $this->item_title->AdvancedSearch->SearchValue = @$filter["x_item_title"];
-        $this->item_title->AdvancedSearch->SearchOperator = @$filter["z_item_title"];
-        $this->item_title->AdvancedSearch->SearchCondition = @$filter["v_item_title"];
-        $this->item_title->AdvancedSearch->SearchValue2 = @$filter["y_item_title"];
-        $this->item_title->AdvancedSearch->SearchOperator2 = @$filter["w_item_title"];
-        $this->item_title->AdvancedSearch->save();
-
-        // Field cost
-        $this->cost->AdvancedSearch->SearchValue = @$filter["x_cost"];
-        $this->cost->AdvancedSearch->SearchOperator = @$filter["z_cost"];
-        $this->cost->AdvancedSearch->SearchCondition = @$filter["v_cost"];
-        $this->cost->AdvancedSearch->SearchValue2 = @$filter["y_cost"];
-        $this->cost->AdvancedSearch->SearchOperator2 = @$filter["w_cost"];
-        $this->cost->AdvancedSearch->save();
-        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
-        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
-    }
-
-    // Show list of filters
-    public function showFilterList()
-    {
-        global $Language;
-
-        // Initialize
-        $filterList = "";
-        $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
-        $captionSuffix = $this->isExport("email") ? ": " : "";
-        if ($this->BasicSearch->Keyword != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
-        }
-
-        // Show Filters
-        if ($filterList != "") {
-            $message = "<div id=\"ew-filter-list\" class=\"callout callout-info d-table\"><div id=\"ew-current-filters\">" .
-                $Language->phrase("CurrentFilters") . "</div>" . $filterList . "</div>";
-            $this->messageShowing($message, "");
-            Write($message);
-        } else { // Output empty tag
-            Write("<div id=\"ew-filter-list\"></div>");
-        }
-    }
-
-    // Return basic search WHERE clause based on search keyword and type
-    public function basicSearchWhere($default = false)
-    {
-        global $Security;
-        $searchStr = "";
-        if (!$Security->canSearch()) {
-            return "";
-        }
-
-        // Fields to search
-        $searchFlds = [];
-        $searchFlds[] = &$this->item_title;
-        $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-        $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-        // Get search SQL
-        if ($searchKeyword != "") {
-            $ar = $this->BasicSearch->keywordList($default);
-            $searchStr = GetQuickSearchFilter($searchFlds, $ar, $searchType, Config("BASIC_SEARCH_ANY_FIELDS"), $this->Dbid);
-            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
-                $this->Command = "search";
-            }
-        }
-        if (!$default && $this->Command == "search") {
-            $this->BasicSearch->setKeyword($searchKeyword);
-            $this->BasicSearch->setType($searchType);
-
-            // Clear rules for QueryBuilder
-            $this->setSessionRules("");
-        }
-        return $searchStr;
-    }
-
-    // Check if search parm exists
-    protected function checkSearchParms()
-    {
-        // Check basic search
-        if ($this->BasicSearch->issetSession()) {
-            return true;
-        }
-        return false;
-    }
-
-    // Clear all search parameters
-    protected function resetSearchParms()
-    {
-        // Clear search WHERE clause
-        $this->SearchWhere = "";
-        $this->setSearchWhere($this->SearchWhere);
-
-        // Clear basic search parameters
-        $this->resetBasicSearchParms();
-    }
-
-    // Load advanced search default values
-    protected function loadAdvancedSearchDefault()
-    {
-        return false;
-    }
-
-    // Clear all basic search parameters
-    protected function resetBasicSearchParms()
-    {
-        $this->BasicSearch->unsetSession();
-    }
-
-    // Restore all search parameters
-    protected function restoreSearchParms()
-    {
-        $this->RestoreSearch = true;
-
-        // Restore basic search values
-        $this->BasicSearch->load();
-    }
-
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -1248,7 +1014,6 @@ class OpdConsultationList extends OpdConsultation
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->visit_id); // visit_id
-            $this->updateSort($this->item_title); // item_title
             $this->updateSort($this->cost); // cost
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1265,11 +1030,6 @@ class OpdConsultationList extends OpdConsultation
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
-            // Reset search criteria
-            if ($this->Command == "reset" || $this->Command == "resetall") {
-                $this->resetSearchParms();
-            }
-
             // Reset master/detail keys
             if ($this->Command == "resetall") {
                 $this->setCurrentMasterTable(""); // Clear master table
@@ -1283,7 +1043,6 @@ class OpdConsultationList extends OpdConsultation
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->visit_id->setSort("");
-                $this->item_title->setSort("");
                 $this->cost->setSort("");
             }
 
@@ -1430,7 +1189,6 @@ class OpdConsultationList extends OpdConsultation
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
             $this->createColumnOption($option, "visit_id");
-            $this->createColumnOption($option, "item_title");
             $this->createColumnOption($option, "cost");
         }
 
@@ -1457,10 +1215,10 @@ class OpdConsultationList extends OpdConsultation
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fopd_consultationsrch\" data-ew-action=\"none\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = true;
+        $item->Visible = false;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fopd_consultationsrch\" data-ew-action=\"none\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = true;
+        $item->Visible = false;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1767,16 +1525,6 @@ class OpdConsultationList extends OpdConsultation
         $this->renderListOptions();
     }
 
-    // Load basic search values
-    protected function loadBasicSearchValues()
-    {
-        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
-        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
-            $this->Command = "search";
-        }
-        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
-    }
-
     /**
      * Load result set
      *
@@ -1871,7 +1619,6 @@ class OpdConsultationList extends OpdConsultation
         // Call Row Selected event
         $this->rowSelected($row);
         $this->visit_id->setDbValue($row['visit_id']);
-        $this->item_title->setDbValue($row['item_title']);
         $this->cost->setDbValue($row['cost']);
     }
 
@@ -1880,7 +1627,6 @@ class OpdConsultationList extends OpdConsultation
     {
         $row = [];
         $row['visit_id'] = $this->visit_id->DefaultValue;
-        $row['item_title'] = $this->item_title->DefaultValue;
         $row['cost'] = $this->cost->DefaultValue;
         return $row;
     }
@@ -1912,8 +1658,6 @@ class OpdConsultationList extends OpdConsultation
 
         // visit_id
 
-        // item_title
-
         // cost
 
         // Accumulate aggregate value
@@ -1929,9 +1673,6 @@ class OpdConsultationList extends OpdConsultation
             $this->visit_id->ViewValue = $this->visit_id->CurrentValue;
             $this->visit_id->ViewValue = FormatNumber($this->visit_id->ViewValue, $this->visit_id->formatPattern());
 
-            // item_title
-            $this->item_title->ViewValue = $this->item_title->CurrentValue;
-
             // cost
             $this->cost->ViewValue = $this->cost->CurrentValue;
             $this->cost->ViewValue = FormatNumber($this->cost->ViewValue, $this->cost->formatPattern());
@@ -1939,10 +1680,6 @@ class OpdConsultationList extends OpdConsultation
             // visit_id
             $this->visit_id->HrefValue = "";
             $this->visit_id->TooltipValue = "";
-
-            // item_title
-            $this->item_title->HrefValue = "";
-            $this->item_title->TooltipValue = "";
 
             // cost
             $this->cost->HrefValue = "";
@@ -2073,21 +1810,6 @@ class OpdConsultationList extends OpdConsultation
         $pageUrl = $this->pageUrl(false);
         $this->SearchOptions = new ListOptions(TagClassName: "ew-search-option");
 
-        // Search button
-        $item = &$this->SearchOptions->add("searchtoggle");
-        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
-        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-ew-action=\"search-toggle\" data-form=\"fopd_consultationsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
-        $item->Visible = true;
-
-        // Show all button
-        $item = &$this->SearchOptions->add("showall");
-        if ($this->UseCustomTemplate || !$this->UseAjaxActions) {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        } else {
-            $item->Body = "<a class=\"btn btn-default ew-show-all\" role=\"button\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" data-ew-action=\"refresh\" data-url=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
-        }
-        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
-
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
         $this->SearchOptions->UseButtonGroup = true;
@@ -2111,7 +1833,7 @@ class OpdConsultationList extends OpdConsultation
     // Check if any search fields
     public function hasSearchFields()
     {
-        return true;
+        return false;
     }
 
     // Render search options

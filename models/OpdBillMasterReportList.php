@@ -1384,17 +1384,17 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
-        // "detail_opd_radiology_master_bill"
-        $item = &$this->ListOptions->add("detail_opd_radiology_master_bill");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'opd_radiology_master_bill');
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
         // "detail_opd_pharmacy_master_bill"
         $item = &$this->ListOptions->add("detail_opd_pharmacy_master_bill");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->allowList(CurrentProjectID() . 'opd_pharmacy_master_bill');
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // "detail_opd_bill_total"
+        $item = &$this->ListOptions->add("detail_opd_bill_total");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'opd_bill_total');
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
@@ -1412,8 +1412,8 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         $pages = new SubPages();
         $pages->add("opd_consultation");
         $pages->add("opd_lab_master_bill");
-        $pages->add("opd_radiology_master_bill");
         $pages->add("opd_pharmacy_master_bill");
+        $pages->add("opd_bill_total");
         $this->DetailPages = $pages;
 
         // List actions
@@ -1598,35 +1598,6 @@ class OpdBillMasterReportList extends OpdBillMasterReport
             }
         }
 
-        // "detail_opd_radiology_master_bill"
-        $opt = $this->ListOptions["detail_opd_radiology_master_bill"];
-        if ($Security->allowList(CurrentProjectID() . 'opd_radiology_master_bill')) {
-            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("opd_radiology_master_bill", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("opdradiologymasterbilllist?" . Config("TABLE_SHOW_MASTER") . "=opd_bill_master_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("OpdRadiologyMasterBillGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'opd_bill_master_report')) {
-                $caption = $Language->phrase("MasterDetailViewLink", null);
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=opd_radiology_master_bill");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "opd_radiology_master_bill";
-            }
-            if ($links != "") {
-                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            } else {
-                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
         // "detail_opd_pharmacy_master_bill"
         $opt = $this->ListOptions["detail_opd_pharmacy_master_bill"];
         if ($Security->allowList(CurrentProjectID() . 'opd_pharmacy_master_bill')) {
@@ -1642,6 +1613,35 @@ class OpdBillMasterReportList extends OpdBillMasterReport
                     $detailViewTblVar .= ",";
                 }
                 $detailViewTblVar .= "opd_pharmacy_master_bill";
+            }
+            if ($links != "") {
+                $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            } else {
+                $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+
+        // "detail_opd_bill_total"
+        $opt = $this->ListOptions["detail_opd_bill_total"];
+        if ($Security->allowList(CurrentProjectID() . 'opd_bill_total')) {
+            $body = $Language->phrase("DetailLink") . $Language->tablePhrase("opd_bill_total", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail" . ($this->ListOptions->UseDropDownButton ? " dropdown-toggle" : "") . "\" data-action=\"list\" href=\"" . HtmlEncode("opdbilltotallist?" . Config("TABLE_SHOW_MASTER") . "=opd_bill_master_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("OpdBillTotalGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'opd_bill_master_report')) {
+                $caption = $Language->phrase("MasterDetailViewLink", null);
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=opd_bill_total");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . $caption . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "opd_bill_total";
             }
             if ($links != "") {
                 $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";

@@ -616,6 +616,9 @@
       <field id="visit_id">
         <phrase id="fldcaption" value="Visit ID" />
       </field>
+      <field id="service_id">
+        <phrase id="fldcaption" value="Service ID" />
+      </field>
       <field id="chief_complaint">
         <phrase id="fldcaption" value="Chief Complaint" />
       </field>
@@ -4255,7 +4258,16 @@
       <field id="id">
         <phrase id="fldcaption" value="Visit ID" />
       </field>
-      <field id="opd_total_bill">
+      <field id="total_consultation">
+        <phrase id="fldcaption" value="total consultation" />
+      </field>
+      <field id="total_lab">
+        <phrase id="fldcaption" value="total lab" />
+      </field>
+      <field id="total_pharmacy">
+        <phrase id="fldcaption" value="total pharmacy" />
+      </field>
+      <field id="total_bll">
         <phrase id="fldcaption" value="Total Bill (Kshs)" />
       </field>
     </table>
@@ -4263,9 +4275,6 @@
       <phrase id="tblcaption" value="Consultation" />
       <field id="visit_id">
         <phrase id="fldcaption" value="Visit ID" />
-      </field>
-      <field id="item_title">
-        <phrase id="fldcaption" value="Consultation" />
       </field>
       <field id="cost">
         <phrase id="fldcaption" value="Cost (Kshs)" />

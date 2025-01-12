@@ -24,7 +24,6 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["visit_id", [fields.visit_id.visible && fields.visit_id.required ? ew.Validators.required(fields.visit_id.caption) : null, ew.Validators.integer], fields.visit_id.isInvalid],
-            ["item_title", [fields.item_title.visible && fields.item_title.required ? ew.Validators.required(fields.item_title.caption) : null], fields.item_title.isInvalid],
             ["cost", [fields.cost.visible && fields.cost.required ? ew.Validators.required(fields.cost.caption) : null, ew.Validators.float], fields.cost.isInvalid]
         ])
 
@@ -32,7 +31,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["visit_id",false],["item_title",false],["cost",false]];
+                    fields = [["visit_id",false],["cost",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -88,9 +87,6 @@ $Grid->ListOptions->render("header", "left");
 ?>
 <?php if ($Grid->visit_id->Visible) { // visit_id ?>
         <th data-name="visit_id" class="<?= $Grid->visit_id->headerCellClass() ?>"><div id="elh_opd_consultation_visit_id" class="opd_consultation_visit_id"><?= $Grid->renderFieldHeader($Grid->visit_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->item_title->Visible) { // item_title ?>
-        <th data-name="item_title" class="<?= $Grid->item_title->headerCellClass() ?>"><div id="elh_opd_consultation_item_title" class="opd_consultation_item_title"><?= $Grid->renderFieldHeader($Grid->item_title) ?></div></th>
 <?php } ?>
 <?php if ($Grid->cost->Visible) { // cost ?>
         <th data-name="cost" class="<?= $Grid->cost->headerCellClass() ?>"><div id="elh_opd_consultation_cost" class="opd_consultation_cost"><?= $Grid->renderFieldHeader($Grid->cost) ?></div></th>
@@ -174,33 +170,6 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 </td>
     <?php } ?>
-    <?php if ($Grid->item_title->Visible) { // item_title ?>
-        <td data-name="item_title"<?= $Grid->item_title->cellAttributes() ?>>
-<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_consultation_item_title" class="el_opd_consultation_item_title">
-<input type="<?= $Grid->item_title->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_item_title" id="x<?= $Grid->RowIndex ?>_item_title" data-table="opd_consultation" data-field="x_item_title" value="<?= $Grid->item_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->item_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->item_title->formatPattern()) ?>"<?= $Grid->item_title->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->item_title->getErrorMessage() ?></div>
-</span>
-<input type="hidden" data-table="opd_consultation" data-field="x_item_title" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_item_title" id="o<?= $Grid->RowIndex ?>_item_title" value="<?= HtmlEncode($Grid->item_title->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_consultation_item_title" class="el_opd_consultation_item_title">
-<input type="<?= $Grid->item_title->getInputTextType() ?>" name="x<?= $Grid->RowIndex ?>_item_title" id="x<?= $Grid->RowIndex ?>_item_title" data-table="opd_consultation" data-field="x_item_title" value="<?= $Grid->item_title->EditValue ?>" size="30" maxlength="100" placeholder="<?= HtmlEncode($Grid->item_title->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Grid->item_title->formatPattern()) ?>"<?= $Grid->item_title->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Grid->item_title->getErrorMessage() ?></div>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
-<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_opd_consultation_item_title" class="el_opd_consultation_item_title">
-<span<?= $Grid->item_title->viewAttributes() ?>>
-<?= $Grid->item_title->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="opd_consultation" data-field="x_item_title" data-hidden="1" name="fopd_consultationgrid$x<?= $Grid->RowIndex ?>_item_title" id="fopd_consultationgrid$x<?= $Grid->RowIndex ?>_item_title" value="<?= HtmlEncode($Grid->item_title->FormValue) ?>">
-<input type="hidden" data-table="opd_consultation" data-field="x_item_title" data-hidden="1" data-old name="fopd_consultationgrid$o<?= $Grid->RowIndex ?>_item_title" id="fopd_consultationgrid$o<?= $Grid->RowIndex ?>_item_title" value="<?= HtmlEncode($Grid->item_title->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
     <?php if ($Grid->cost->Visible) { // cost ?>
         <td data-name="cost"<?= $Grid->cost->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
@@ -271,10 +240,6 @@ $Grid->ListOptions->render("footer", "left");
 ?>
     <?php if ($Grid->visit_id->Visible) { // visit_id ?>
         <td data-name="visit_id" class="<?= $Grid->visit_id->footerCellClass() ?>"><span id="elf_opd_consultation_visit_id" class="opd_consultation_visit_id">
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->item_title->Visible) { // item_title ?>
-        <td data-name="item_title" class="<?= $Grid->item_title->footerCellClass() ?>"><span id="elf_opd_consultation_item_title" class="opd_consultation_item_title">
         </span></td>
     <?php } ?>
     <?php if ($Grid->cost->Visible) { // cost ?>

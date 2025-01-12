@@ -31,9 +31,6 @@ class OpdConsultation extends AbstractEntity
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
 
-    #[Column(name: "item_title", type: "string")]
-    private string $itemTitle;
-
     #[Column(type: "float")]
     private float $cost;
 
@@ -45,17 +42,6 @@ class OpdConsultation extends AbstractEntity
     public function setVisitId(int $value): static
     {
         $this->visitId = $value;
-        return $this;
-    }
-
-    public function getItemTitle(): string
-    {
-        return HtmlDecode($this->itemTitle);
-    }
-
-    public function setItemTitle(string $value): static
-    {
-        $this->itemTitle = RemoveXss($value);
         return $this;
     }
 

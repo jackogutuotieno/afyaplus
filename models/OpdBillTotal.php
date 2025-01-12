@@ -48,7 +48,10 @@ class OpdBillTotal extends DbTable
 
     // Fields
     public $id;
-    public $opd_total_bill;
+    public $total_consultation;
+    public $total_lab;
+    public $total_pharmacy;
+    public $total_bll;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -116,35 +119,110 @@ class OpdBillTotal extends DbTable
         $this->id->addMethod("getDefault", fn() => 0);
         $this->id->InputTextType = "text";
         $this->id->Raw = true;
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
-        $this->id->Required = true; // Required field
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
-        // opd_total_bill
-        $this->opd_total_bill = new DbField(
+        // total_consultation
+        $this->total_consultation = new DbField(
             $this, // Table
-            'x_opd_total_bill', // Variable name
-            'opd_total_bill', // Name
-            '`opd_total_bill`', // Expression
-            '`opd_total_bill`', // Basic search expression
+            'x_total_consultation', // Variable name
+            'total_consultation', // Name
+            '`total_consultation`', // Expression
+            '`total_consultation`', // Basic search expression
             5, // Type
-            23, // Size
+            22, // Size
             -1, // Date/Time format
             false, // Is upload field
-            '`opd_total_bill`', // Virtual expression
+            '`total_consultation`', // Virtual expression
             false, // Is virtual
             false, // Force selection
             false, // Is Virtual search
             'FORMATTED TEXT', // View Tag
             'TEXT' // Edit Tag
         );
-        $this->opd_total_bill->InputTextType = "text";
-        $this->opd_total_bill->Raw = true;
-        $this->opd_total_bill->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
-        $this->opd_total_bill->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
-        $this->Fields['opd_total_bill'] = &$this->opd_total_bill;
+        $this->total_consultation->InputTextType = "text";
+        $this->total_consultation->Raw = true;
+        $this->total_consultation->Nullable = false; // NOT NULL field
+        $this->total_consultation->Required = true; // Required field
+        $this->total_consultation->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->total_consultation->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['total_consultation'] = &$this->total_consultation;
+
+        // total_lab
+        $this->total_lab = new DbField(
+            $this, // Table
+            'x_total_lab', // Variable name
+            'total_lab', // Name
+            '`total_lab`', // Expression
+            '`total_lab`', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`total_lab`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->total_lab->InputTextType = "text";
+        $this->total_lab->Raw = true;
+        $this->total_lab->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->total_lab->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['total_lab'] = &$this->total_lab;
+
+        // total_pharmacy
+        $this->total_pharmacy = new DbField(
+            $this, // Table
+            'x_total_pharmacy', // Variable name
+            'total_pharmacy', // Name
+            '`total_pharmacy`', // Expression
+            '`total_pharmacy`', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`total_pharmacy`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->total_pharmacy->InputTextType = "text";
+        $this->total_pharmacy->Raw = true;
+        $this->total_pharmacy->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->total_pharmacy->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['total_pharmacy'] = &$this->total_pharmacy;
+
+        // total_bll
+        $this->total_bll = new DbField(
+            $this, // Table
+            'x_total_bll', // Variable name
+            'total_bll', // Name
+            'total_consultation + total_lab + total_pharmacy', // Expression
+            'total_consultation + total_lab + total_pharmacy', // Basic search expression
+            5, // Type
+            23, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            'total_consultation + total_lab + total_pharmacy', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->total_bll->InputTextType = "text";
+        $this->total_bll->Raw = true;
+        $this->total_bll->IsCustom = true; // Custom field
+        $this->total_bll->DefaultErrorMessage = $Language->phrase("IncorrectFloat");
+        $this->total_bll->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN", "IS NULL", "IS NOT NULL"];
+        $this->Fields['total_bll'] = &$this->total_bll;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -204,6 +282,88 @@ class OpdBillTotal extends DbTable
         }
     }
 
+    // Current master table name
+    public function getCurrentMasterTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
+    }
+
+    public function setCurrentMasterTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
+    }
+
+    // Get master WHERE clause from session values
+    public function getMasterFilterFromSession()
+    {
+        // Master filter
+        $masterFilter = "";
+        if ($this->getCurrentMasterTable() == "opd_bill_master_report") {
+            $masterTable = Container("opd_bill_master_report");
+            if ($this->id->getSessionValue() != "") {
+                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $masterFilter;
+    }
+
+    // Get detail WHERE clause from session values
+    public function getDetailFilterFromSession()
+    {
+        // Detail filter
+        $detailFilter = "";
+        if ($this->getCurrentMasterTable() == "opd_bill_master_report") {
+            $masterTable = Container("opd_bill_master_report");
+            if ($this->id->getSessionValue() != "") {
+                $detailFilter .= "" . GetKeyFilter($this->id, $this->id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
+            } else {
+                return "";
+            }
+        }
+        return $detailFilter;
+    }
+
+    /**
+     * Get master filter
+     *
+     * @param object $masterTable Master Table
+     * @param array $keys Detail Keys
+     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
+     */
+    public function getMasterFilter($masterTable, $keys)
+    {
+        $validKeys = true;
+        switch ($masterTable->TableVar) {
+            case "opd_bill_master_report":
+                $key = $keys["id"] ?? "";
+                if (EmptyValue($key)) {
+                    if ($masterTable->id->Required) { // Required field and empty value
+                        return ""; // Return empty filter
+                    }
+                    $validKeys = false;
+                } elseif (!$validKeys) { // Already has empty key
+                    return ""; // Return empty filter
+                }
+                if ($validKeys) {
+                    return GetKeyFilter($masterTable->id, $keys["id"], $this->id->DataType, $this->Dbid);
+                }
+                break;
+        }
+        return null; // All null values and no required fields
+    }
+
+    // Get detail filter
+    public function getDetailFilter($masterTable)
+    {
+        switch ($masterTable->TableVar) {
+            case "opd_bill_master_report":
+                return GetKeyFilter($this->id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
+        }
+        return "";
+    }
+
     // Render X Axis for chart
     public function renderChartXAxis($chartVar, $chartRow)
     {
@@ -237,20 +397,7 @@ class OpdBillTotal extends DbTable
     // Get list of fields
     private function sqlSelectFields()
     {
-        $useFieldNames = false;
-        $fieldNames = [];
-        $platform = $this->getConnection()->getDatabasePlatform();
-        foreach ($this->Fields as $field) {
-            $expr = $field->Expression;
-            $customExpr = $field->CustomDataType?->convertToPHPValueSQL($expr, $platform) ?? $expr;
-            if ($customExpr != $expr) {
-                $fieldNames[] = $customExpr . " AS " . QuotedName($field->Name, $this->Dbid);
-                $useFieldNames = true;
-            } else {
-                $fieldNames[] = $expr;
-            }
-        }
-        return $useFieldNames ? implode(", ", $fieldNames) : "*";
+        return "*, total_consultation + total_lab + total_pharmacy AS `total_bll`";
     }
 
     // Get SELECT clause (for backward compatibility)
@@ -653,7 +800,10 @@ class OpdBillTotal extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
-        $this->opd_total_bill->DbValue = $row['opd_total_bill'];
+        $this->total_consultation->DbValue = $row['total_consultation'];
+        $this->total_lab->DbValue = $row['total_lab'];
+        $this->total_pharmacy->DbValue = $row['total_pharmacy'];
+        $this->total_bll->DbValue = $row['total_bll'];
     }
 
     // Delete uploaded files
@@ -824,6 +974,10 @@ class OpdBillTotal extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
+        if ($this->getCurrentMasterTable() == "opd_bill_master_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->id->getSessionValue()); // Use Session Value
+        }
         return $url;
     }
 
@@ -962,7 +1116,10 @@ class OpdBillTotal extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
-        $this->opd_total_bill->setDbValue($row['opd_total_bill']);
+        $this->total_consultation->setDbValue($row['total_consultation']);
+        $this->total_lab->setDbValue($row['total_lab']);
+        $this->total_pharmacy->setDbValue($row['total_pharmacy']);
+        $this->total_bll->setDbValue($row['total_bll']);
     }
 
     // Render list content
@@ -995,23 +1152,53 @@ class OpdBillTotal extends DbTable
 
         // id
 
-        // opd_total_bill
+        // total_consultation
+
+        // total_lab
+
+        // total_pharmacy
+
+        // total_bll
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
-        // opd_total_bill
-        $this->opd_total_bill->ViewValue = $this->opd_total_bill->CurrentValue;
-        $this->opd_total_bill->ViewValue = FormatNumber($this->opd_total_bill->ViewValue, $this->opd_total_bill->formatPattern());
+        // total_consultation
+        $this->total_consultation->ViewValue = $this->total_consultation->CurrentValue;
+        $this->total_consultation->ViewValue = FormatNumber($this->total_consultation->ViewValue, $this->total_consultation->formatPattern());
+
+        // total_lab
+        $this->total_lab->ViewValue = $this->total_lab->CurrentValue;
+        $this->total_lab->ViewValue = FormatNumber($this->total_lab->ViewValue, $this->total_lab->formatPattern());
+
+        // total_pharmacy
+        $this->total_pharmacy->ViewValue = $this->total_pharmacy->CurrentValue;
+        $this->total_pharmacy->ViewValue = FormatNumber($this->total_pharmacy->ViewValue, $this->total_pharmacy->formatPattern());
+
+        // total_bll
+        $this->total_bll->ViewValue = $this->total_bll->CurrentValue;
+        $this->total_bll->ViewValue = FormatNumber($this->total_bll->ViewValue, $this->total_bll->formatPattern());
 
         // id
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
-        // opd_total_bill
-        $this->opd_total_bill->HrefValue = "";
-        $this->opd_total_bill->TooltipValue = "";
+        // total_consultation
+        $this->total_consultation->HrefValue = "";
+        $this->total_consultation->TooltipValue = "";
+
+        // total_lab
+        $this->total_lab->HrefValue = "";
+        $this->total_lab->TooltipValue = "";
+
+        // total_pharmacy
+        $this->total_pharmacy->HrefValue = "";
+        $this->total_pharmacy->TooltipValue = "";
+
+        // total_bll
+        $this->total_bll->HrefValue = "";
+        $this->total_bll->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1030,18 +1217,48 @@ class OpdBillTotal extends DbTable
 
         // id
         $this->id->setupEditAttributes();
-        $this->id->EditValue = $this->id->CurrentValue;
-        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-        if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
-            $this->id->EditValue = FormatNumber($this->id->EditValue, null);
+        if ($this->id->getSessionValue() != "") {
+            $this->id->CurrentValue = GetForeignKeyValue($this->id->getSessionValue());
+            $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
+        } else {
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+            if (strval($this->id->EditValue) != "" && is_numeric($this->id->EditValue)) {
+                $this->id->EditValue = FormatNumber($this->id->EditValue, null);
+            }
         }
 
-        // opd_total_bill
-        $this->opd_total_bill->setupEditAttributes();
-        $this->opd_total_bill->EditValue = $this->opd_total_bill->CurrentValue;
-        $this->opd_total_bill->PlaceHolder = RemoveHtml($this->opd_total_bill->caption());
-        if (strval($this->opd_total_bill->EditValue) != "" && is_numeric($this->opd_total_bill->EditValue)) {
-            $this->opd_total_bill->EditValue = FormatNumber($this->opd_total_bill->EditValue, null);
+        // total_consultation
+        $this->total_consultation->setupEditAttributes();
+        $this->total_consultation->EditValue = $this->total_consultation->CurrentValue;
+        $this->total_consultation->PlaceHolder = RemoveHtml($this->total_consultation->caption());
+        if (strval($this->total_consultation->EditValue) != "" && is_numeric($this->total_consultation->EditValue)) {
+            $this->total_consultation->EditValue = FormatNumber($this->total_consultation->EditValue, null);
+        }
+
+        // total_lab
+        $this->total_lab->setupEditAttributes();
+        $this->total_lab->EditValue = $this->total_lab->CurrentValue;
+        $this->total_lab->PlaceHolder = RemoveHtml($this->total_lab->caption());
+        if (strval($this->total_lab->EditValue) != "" && is_numeric($this->total_lab->EditValue)) {
+            $this->total_lab->EditValue = FormatNumber($this->total_lab->EditValue, null);
+        }
+
+        // total_pharmacy
+        $this->total_pharmacy->setupEditAttributes();
+        $this->total_pharmacy->EditValue = $this->total_pharmacy->CurrentValue;
+        $this->total_pharmacy->PlaceHolder = RemoveHtml($this->total_pharmacy->caption());
+        if (strval($this->total_pharmacy->EditValue) != "" && is_numeric($this->total_pharmacy->EditValue)) {
+            $this->total_pharmacy->EditValue = FormatNumber($this->total_pharmacy->EditValue, null);
+        }
+
+        // total_bll
+        $this->total_bll->setupEditAttributes();
+        $this->total_bll->EditValue = $this->total_bll->CurrentValue;
+        $this->total_bll->PlaceHolder = RemoveHtml($this->total_bll->caption());
+        if (strval($this->total_bll->EditValue) != "" && is_numeric($this->total_bll->EditValue)) {
+            $this->total_bll->EditValue = FormatNumber($this->total_bll->EditValue, null);
         }
 
         // Call Row Rendered event
@@ -1073,10 +1290,16 @@ class OpdBillTotal extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->opd_total_bill);
+                    $doc->exportCaption($this->total_consultation);
+                    $doc->exportCaption($this->total_lab);
+                    $doc->exportCaption($this->total_pharmacy);
+                    $doc->exportCaption($this->total_bll);
                 } else {
                     $doc->exportCaption($this->id);
-                    $doc->exportCaption($this->opd_total_bill);
+                    $doc->exportCaption($this->total_consultation);
+                    $doc->exportCaption($this->total_lab);
+                    $doc->exportCaption($this->total_pharmacy);
+                    $doc->exportCaption($this->total_bll);
                 }
                 $doc->endExportRow();
             }
@@ -1104,10 +1327,16 @@ class OpdBillTotal extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->opd_total_bill);
+                        $doc->exportField($this->total_consultation);
+                        $doc->exportField($this->total_lab);
+                        $doc->exportField($this->total_pharmacy);
+                        $doc->exportField($this->total_bll);
                     } else {
                         $doc->exportField($this->id);
-                        $doc->exportField($this->opd_total_bill);
+                        $doc->exportField($this->total_consultation);
+                        $doc->exportField($this->total_lab);
+                        $doc->exportField($this->total_pharmacy);
+                        $doc->exportField($this->total_bll);
                     }
                     $doc->endExportRow($rowCnt);
                 }

@@ -137,7 +137,10 @@ class OpdBillTotalGrid extends OpdBillTotal
     public function setVisibility()
     {
         $this->id->Visible = false;
-        $this->opd_total_bill->setVisibility();
+        $this->total_consultation->Visible = false;
+        $this->total_lab->Visible = false;
+        $this->total_pharmacy->Visible = false;
+        $this->total_bll->setVisibility();
     }
 
     // Constructor
@@ -844,7 +847,7 @@ class OpdBillTotalGrid extends OpdBillTotal
     // Exit inline mode
     protected function clearInlineMode()
     {
-        $this->opd_total_bill->FormValue = ""; // Clear form value
+        $this->total_bll->FormValue = ""; // Clear form value
         $this->LastAction = $this->CurrentAction; // Save last action
         $this->CurrentAction = ""; // Clear action
         $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -1081,10 +1084,10 @@ class OpdBillTotalGrid extends OpdBillTotal
     {
         global $CurrentForm;
         if (
-            $CurrentForm->hasValue("x_opd_total_bill") &&
-            $CurrentForm->hasValue("o_opd_total_bill") &&
-            $this->opd_total_bill->CurrentValue != $this->opd_total_bill->DefaultValue &&
-            !($this->opd_total_bill->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->opd_total_bill->CurrentValue == $this->opd_total_bill->getSessionValue())
+            $CurrentForm->hasValue("x_total_bll") &&
+            $CurrentForm->hasValue("o_total_bll") &&
+            $this->total_bll->CurrentValue != $this->total_bll->DefaultValue &&
+            !($this->total_bll->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->total_bll->CurrentValue == $this->total_bll->getSessionValue())
         ) {
             return false;
         }
@@ -1556,17 +1559,17 @@ class OpdBillTotalGrid extends OpdBillTotal
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
-        // Check field name 'opd_total_bill' first before field var 'x_opd_total_bill'
-        $val = $CurrentForm->hasValue("opd_total_bill") ? $CurrentForm->getValue("opd_total_bill") : $CurrentForm->getValue("x_opd_total_bill");
-        if (!$this->opd_total_bill->IsDetailKey) {
+        // Check field name 'total_bll' first before field var 'x_total_bll'
+        $val = $CurrentForm->hasValue("total_bll") ? $CurrentForm->getValue("total_bll") : $CurrentForm->getValue("x_total_bll");
+        if (!$this->total_bll->IsDetailKey) {
             if (IsApi() && $val === null) {
-                $this->opd_total_bill->Visible = false; // Disable update for API request
+                $this->total_bll->Visible = false; // Disable update for API request
             } else {
-                $this->opd_total_bill->setFormValue($val, true, $validate);
+                $this->total_bll->setFormValue($val, true, $validate);
             }
         }
-        if ($CurrentForm->hasValue("o_opd_total_bill")) {
-            $this->opd_total_bill->setOldValue($CurrentForm->getValue("o_opd_total_bill"));
+        if ($CurrentForm->hasValue("o_total_bll")) {
+            $this->total_bll->setOldValue($CurrentForm->getValue("o_total_bll"));
         }
     }
 
@@ -1574,7 +1577,7 @@ class OpdBillTotalGrid extends OpdBillTotal
     public function restoreFormValues()
     {
         global $CurrentForm;
-        $this->opd_total_bill->CurrentValue = $this->opd_total_bill->FormValue;
+        $this->total_bll->CurrentValue = $this->total_bll->FormValue;
     }
 
     /**
@@ -1671,7 +1674,10 @@ class OpdBillTotalGrid extends OpdBillTotal
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
-        $this->opd_total_bill->setDbValue($row['opd_total_bill']);
+        $this->total_consultation->setDbValue($row['total_consultation']);
+        $this->total_lab->setDbValue($row['total_lab']);
+        $this->total_pharmacy->setDbValue($row['total_pharmacy']);
+        $this->total_bll->setDbValue($row['total_bll']);
     }
 
     // Return a row with default values
@@ -1679,7 +1685,10 @@ class OpdBillTotalGrid extends OpdBillTotal
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
-        $row['opd_total_bill'] = $this->opd_total_bill->DefaultValue;
+        $row['total_consultation'] = $this->total_consultation->DefaultValue;
+        $row['total_lab'] = $this->total_lab->DefaultValue;
+        $row['total_pharmacy'] = $this->total_pharmacy->DefaultValue;
+        $row['total_bll'] = $this->total_bll->DefaultValue;
         return $row;
     }
 
@@ -1708,7 +1717,13 @@ class OpdBillTotalGrid extends OpdBillTotal
 
         // id
 
-        // opd_total_bill
+        // total_consultation
+
+        // total_lab
+
+        // total_pharmacy
+
+        // total_bll
 
         // View row
         if ($this->RowType == RowType::VIEW) {
@@ -1716,39 +1731,51 @@ class OpdBillTotalGrid extends OpdBillTotal
             $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewValue = FormatNumber($this->id->ViewValue, $this->id->formatPattern());
 
-            // opd_total_bill
-            $this->opd_total_bill->ViewValue = $this->opd_total_bill->CurrentValue;
-            $this->opd_total_bill->ViewValue = FormatNumber($this->opd_total_bill->ViewValue, $this->opd_total_bill->formatPattern());
+            // total_consultation
+            $this->total_consultation->ViewValue = $this->total_consultation->CurrentValue;
+            $this->total_consultation->ViewValue = FormatNumber($this->total_consultation->ViewValue, $this->total_consultation->formatPattern());
 
-            // opd_total_bill
-            $this->opd_total_bill->HrefValue = "";
-            $this->opd_total_bill->TooltipValue = "";
+            // total_lab
+            $this->total_lab->ViewValue = $this->total_lab->CurrentValue;
+            $this->total_lab->ViewValue = FormatNumber($this->total_lab->ViewValue, $this->total_lab->formatPattern());
+
+            // total_pharmacy
+            $this->total_pharmacy->ViewValue = $this->total_pharmacy->CurrentValue;
+            $this->total_pharmacy->ViewValue = FormatNumber($this->total_pharmacy->ViewValue, $this->total_pharmacy->formatPattern());
+
+            // total_bll
+            $this->total_bll->ViewValue = $this->total_bll->CurrentValue;
+            $this->total_bll->ViewValue = FormatNumber($this->total_bll->ViewValue, $this->total_bll->formatPattern());
+
+            // total_bll
+            $this->total_bll->HrefValue = "";
+            $this->total_bll->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
-            // opd_total_bill
-            $this->opd_total_bill->setupEditAttributes();
-            $this->opd_total_bill->EditValue = $this->opd_total_bill->CurrentValue;
-            $this->opd_total_bill->PlaceHolder = RemoveHtml($this->opd_total_bill->caption());
-            if (strval($this->opd_total_bill->EditValue) != "" && is_numeric($this->opd_total_bill->EditValue)) {
-                $this->opd_total_bill->EditValue = FormatNumber($this->opd_total_bill->EditValue, null);
+            // total_bll
+            $this->total_bll->setupEditAttributes();
+            $this->total_bll->EditValue = $this->total_bll->CurrentValue;
+            $this->total_bll->PlaceHolder = RemoveHtml($this->total_bll->caption());
+            if (strval($this->total_bll->EditValue) != "" && is_numeric($this->total_bll->EditValue)) {
+                $this->total_bll->EditValue = FormatNumber($this->total_bll->EditValue, null);
             }
 
             // Add refer script
 
-            // opd_total_bill
-            $this->opd_total_bill->HrefValue = "";
+            // total_bll
+            $this->total_bll->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
-            // opd_total_bill
-            $this->opd_total_bill->setupEditAttributes();
-            $this->opd_total_bill->EditValue = $this->opd_total_bill->CurrentValue;
-            $this->opd_total_bill->PlaceHolder = RemoveHtml($this->opd_total_bill->caption());
-            if (strval($this->opd_total_bill->EditValue) != "" && is_numeric($this->opd_total_bill->EditValue)) {
-                $this->opd_total_bill->EditValue = FormatNumber($this->opd_total_bill->EditValue, null);
+            // total_bll
+            $this->total_bll->setupEditAttributes();
+            $this->total_bll->EditValue = $this->total_bll->CurrentValue;
+            $this->total_bll->PlaceHolder = RemoveHtml($this->total_bll->caption());
+            if (strval($this->total_bll->EditValue) != "" && is_numeric($this->total_bll->EditValue)) {
+                $this->total_bll->EditValue = FormatNumber($this->total_bll->EditValue, null);
             }
 
             // Edit refer script
 
-            // opd_total_bill
-            $this->opd_total_bill->HrefValue = "";
+            // total_bll
+            $this->total_bll->HrefValue = "";
         }
         if ($this->RowType == RowType::ADD || $this->RowType == RowType::EDIT || $this->RowType == RowType::SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1770,13 +1797,13 @@ class OpdBillTotalGrid extends OpdBillTotal
             return true;
         }
         $validateForm = true;
-            if ($this->opd_total_bill->Visible && $this->opd_total_bill->Required) {
-                if (!$this->opd_total_bill->IsDetailKey && EmptyValue($this->opd_total_bill->FormValue)) {
-                    $this->opd_total_bill->addErrorMessage(str_replace("%s", $this->opd_total_bill->caption(), $this->opd_total_bill->RequiredErrorMessage));
+            if ($this->total_bll->Visible && $this->total_bll->Required) {
+                if (!$this->total_bll->IsDetailKey && EmptyValue($this->total_bll->FormValue)) {
+                    $this->total_bll->addErrorMessage(str_replace("%s", $this->total_bll->caption(), $this->total_bll->RequiredErrorMessage));
                 }
             }
-            if (!CheckNumber($this->opd_total_bill->FormValue)) {
-                $this->opd_total_bill->addErrorMessage($this->opd_total_bill->getErrorMessage(false));
+            if (!CheckNumber($this->total_bll->FormValue)) {
+                $this->total_bll->addErrorMessage($this->total_bll->getErrorMessage(false));
             }
 
         // Return validate result
@@ -1924,8 +1951,8 @@ class OpdBillTotalGrid extends OpdBillTotal
         global $Security;
         $rsnew = [];
 
-        // opd_total_bill
-        $this->opd_total_bill->setDbValueDef($rsnew, $this->opd_total_bill->CurrentValue, $this->opd_total_bill->ReadOnly);
+        // total_bll
+        $this->total_bll->setDbValueDef($rsnew, $this->total_bll->CurrentValue, $this->total_bll->ReadOnly);
         return $rsnew;
     }
 
@@ -1935,8 +1962,8 @@ class OpdBillTotalGrid extends OpdBillTotal
      */
     protected function restoreEditFormFromRow($row)
     {
-        if (isset($row['opd_total_bill'])) { // opd_total_bill
-            $this->opd_total_bill->CurrentValue = $row['opd_total_bill'];
+        if (isset($row['total_bll'])) { // total_bll
+            $this->total_bll->CurrentValue = $row['total_bll'];
         }
     }
 
@@ -1997,8 +2024,8 @@ class OpdBillTotalGrid extends OpdBillTotal
         global $Security;
         $rsnew = [];
 
-        // opd_total_bill
-        $this->opd_total_bill->setDbValueDef($rsnew, $this->opd_total_bill->CurrentValue, false);
+        // total_bll
+        $this->total_bll->setDbValueDef($rsnew, $this->total_bll->CurrentValue, false);
 
         // id
         if ($this->id->getSessionValue() != "") {
@@ -2013,8 +2040,8 @@ class OpdBillTotalGrid extends OpdBillTotal
      */
     protected function restoreAddFormFromRow($row)
     {
-        if (isset($row['opd_total_bill'])) { // opd_total_bill
-            $this->opd_total_bill->setFormValue($row['opd_total_bill']);
+        if (isset($row['total_bll'])) { // total_bll
+            $this->total_bll->setFormValue($row['total_bll']);
         }
         if (isset($row['id'])) { // id
             $this->id->setFormValue($row['id']);

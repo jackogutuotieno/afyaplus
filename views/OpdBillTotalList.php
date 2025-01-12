@@ -50,6 +50,15 @@ loadjs.ready("head", function () {
 <?php } ?>
 </div>
 <?php } ?>
+<?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "opd_bill_master_report") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/OpdBillMasterReportMaster.php";
+    }
+}
+?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <?php } ?>
 <?php $Page->showPageHeader(); ?>
@@ -82,6 +91,10 @@ $Page->showMessage();
 <?php if ($Page->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "opd_bill_master_report" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="opd_bill_master_report">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->id->getSessionValue()) ?>">
+<?php } ?>
 <div id="gmp_opd_bill_total" class="card-body ew-grid-middle-panel <?= $Page->TableContainerClass ?>" style="<?= $Page->TableContainerStyle ?>">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit() || $Page->isMultiEdit()) { ?>
 <table id="tbl_opd_bill_totallist" class="<?= $Page->TableClass ?>"><!-- .ew-table -->
@@ -97,8 +110,8 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
-<?php if ($Page->opd_total_bill->Visible) { // opd_total_bill ?>
-        <th data-name="opd_total_bill" class="<?= $Page->opd_total_bill->headerCellClass() ?>"><div id="elh_opd_bill_total_opd_total_bill" class="opd_bill_total_opd_total_bill"><?= $Page->renderFieldHeader($Page->opd_total_bill) ?></div></th>
+<?php if ($Page->total_bll->Visible) { // total_bll ?>
+        <th data-name="total_bll" class="<?= $Page->total_bll->headerCellClass() ?>"><div id="elh_opd_bill_total_total_bll" class="opd_bill_total_total_bll"><?= $Page->renderFieldHeader($Page->total_bll) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -128,11 +141,11 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
-    <?php if ($Page->opd_total_bill->Visible) { // opd_total_bill ?>
-        <td data-name="opd_total_bill"<?= $Page->opd_total_bill->cellAttributes() ?>>
-<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_opd_bill_total_opd_total_bill" class="el_opd_bill_total_opd_total_bill">
-<span<?= $Page->opd_total_bill->viewAttributes() ?>>
-<?= $Page->opd_total_bill->getViewValue() ?></span>
+    <?php if ($Page->total_bll->Visible) { // total_bll ?>
+        <td data-name="total_bll"<?= $Page->total_bll->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_opd_bill_total_total_bll" class="el_opd_bill_total_total_bll">
+<span<?= $Page->total_bll->viewAttributes() ?>>
+<?= $Page->total_bll->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

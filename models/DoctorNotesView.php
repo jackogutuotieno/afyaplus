@@ -151,6 +151,7 @@ class DoctorNotesView extends DoctorNotes
         $this->id->setVisibility();
         $this->patient_id->setVisibility();
         $this->visit_id->setVisibility();
+        $this->service_id->setVisibility();
         $this->chief_complaint->setVisibility();
         $this->history_of_presenting_illness->setVisibility();
         $this->past_medical_history->setVisibility();
@@ -832,6 +833,7 @@ class DoctorNotesView extends DoctorNotes
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
+        $this->service_id->setDbValue($row['service_id']);
         $this->chief_complaint->setDbValue($row['chief_complaint']);
         $this->history_of_presenting_illness->setDbValue($row['history_of_presenting_illness']);
         $this->past_medical_history->setDbValue($row['past_medical_history']);
@@ -849,6 +851,7 @@ class DoctorNotesView extends DoctorNotes
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
+        $row['service_id'] = $this->service_id->DefaultValue;
         $row['chief_complaint'] = $this->chief_complaint->DefaultValue;
         $row['history_of_presenting_illness'] = $this->history_of_presenting_illness->DefaultValue;
         $row['past_medical_history'] = $this->past_medical_history->DefaultValue;
@@ -883,6 +886,8 @@ class DoctorNotesView extends DoctorNotes
         // patient_id
 
         // visit_id
+
+        // service_id
 
         // chief_complaint
 

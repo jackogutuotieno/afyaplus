@@ -31,8 +31,14 @@ class OpdBillTotal extends AbstractEntity
     #[Column(type: "integer")]
     private int $id;
 
-    #[Column(name: "opd_total_bill", type: "float", nullable: true)]
-    private ?float $opdTotalBill;
+    #[Column(name: "total_consultation", type: "float")]
+    private float $totalConsultation;
+
+    #[Column(name: "total_lab", type: "float", nullable: true)]
+    private ?float $totalLab;
+
+    #[Column(name: "total_pharmacy", type: "float", nullable: true)]
+    private ?float $totalPharmacy;
 
     public function __construct()
     {
@@ -50,14 +56,36 @@ class OpdBillTotal extends AbstractEntity
         return $this;
     }
 
-    public function getOpdTotalBill(): ?float
+    public function getTotalConsultation(): float
     {
-        return $this->opdTotalBill;
+        return $this->totalConsultation;
     }
 
-    public function setOpdTotalBill(?float $value): static
+    public function setTotalConsultation(float $value): static
     {
-        $this->opdTotalBill = $value;
+        $this->totalConsultation = $value;
+        return $this;
+    }
+
+    public function getTotalLab(): ?float
+    {
+        return $this->totalLab;
+    }
+
+    public function setTotalLab(?float $value): static
+    {
+        $this->totalLab = $value;
+        return $this;
+    }
+
+    public function getTotalPharmacy(): ?float
+    {
+        return $this->totalPharmacy;
+    }
+
+    public function setTotalPharmacy(?float $value): static
+    {
+        $this->totalPharmacy = $value;
         return $this;
     }
 }

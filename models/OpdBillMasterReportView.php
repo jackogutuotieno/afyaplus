@@ -750,38 +750,6 @@ class OpdBillMasterReportView extends OpdBillMasterReport
             $item->Visible = false;
         }
 
-        // "detail_opd_radiology_master_bill"
-        $item = &$option->add("detail_opd_radiology_master_bill");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("opd_radiology_master_bill", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("opdradiologymasterbilllist?" . Config("TABLE_SHOW_MASTER") . "=opd_bill_master_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("OpdRadiologyMasterBillGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'opd_bill_master_report')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=opd_radiology_master_bill"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "opd_radiology_master_bill";
-        }
-        if ($links != "") {
-            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        } else {
-            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'opd_radiology_master_bill');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "opd_radiology_master_bill";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
         // "detail_opd_pharmacy_master_bill"
         $item = &$option->add("detail_opd_pharmacy_master_bill");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("opd_pharmacy_master_bill", "TblCaption");
@@ -809,6 +777,38 @@ class OpdBillMasterReportView extends OpdBillMasterReport
                 $detailTableLink .= ",";
             }
             $detailTableLink .= "opd_pharmacy_master_bill";
+        }
+        if ($this->ShowMultipleDetails) {
+            $item->Visible = false;
+        }
+
+        // "detail_opd_bill_total"
+        $item = &$option->add("detail_opd_bill_total");
+        $body = $Language->phrase("ViewPageDetailLink") . $Language->tablePhrase("opd_bill_total", "TblCaption");
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("opdbilltotallist?" . Config("TABLE_SHOW_MASTER") . "=opd_bill_master_report&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $links = "";
+        $detailPageObj = Container("OpdBillTotalGrid");
+        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'opd_bill_master_report')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=opd_bill_total"))) . "\">" . $Language->phrase("MasterDetailViewLink", null) . "</a></li>";
+            if ($detailViewTblVar != "") {
+                $detailViewTblVar .= ",";
+            }
+            $detailViewTblVar .= "opd_bill_total";
+        }
+        if ($links != "") {
+            $body .= "<button type=\"button\" class=\"dropdown-toggle btn btn-default ew-detail\" data-bs-toggle=\"dropdown\"></button>";
+            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+        } else {
+            $body = preg_replace('/\b\s+dropdown-toggle\b/', "", $body);
+        }
+        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+        $item->Body = $body;
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'opd_bill_total');
+        if ($item->Visible) {
+            if ($detailTableLink != "") {
+                $detailTableLink .= ",";
+            }
+            $detailTableLink .= "opd_bill_total";
         }
         if ($this->ShowMultipleDetails) {
             $item->Visible = false;
@@ -1292,25 +1292,6 @@ class OpdBillMasterReportView extends OpdBillMasterReport
             }
         }
 
-        // Export detail records (opd_radiology_master_bill)
-        if (Config("EXPORT_DETAIL_RECORDS") && in_array("opd_radiology_master_bill", explode(",", $this->getCurrentDetailTable()))) {
-            $opd_radiology_master_bill = new OpdRadiologyMasterBillList();
-            $rsdetail = $opd_radiology_master_bill->loadRs($opd_radiology_master_bill->getDetailFilterFromSession(), $opd_radiology_master_bill->getSessionOrderBy()); // Load detail records
-            if ($rsdetail) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("h"); // Change to horizontal
-                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
-                    $doc->exportEmptyRow();
-                    $detailcnt = $rsdetail->rowCount();
-                    $oldtbl = $doc->getTable();
-                    $doc->setTable($opd_radiology_master_bill);
-                    $opd_radiology_master_bill->exportDocument($doc, $rsdetail, 1, $detailcnt);
-                    $doc->setTable($oldtbl);
-                }
-                $doc->setStyle($exportStyle); // Restore
-            }
-        }
-
         // Export detail records (opd_pharmacy_master_bill)
         if (Config("EXPORT_DETAIL_RECORDS") && in_array("opd_pharmacy_master_bill", explode(",", $this->getCurrentDetailTable()))) {
             $opd_pharmacy_master_bill = new OpdPharmacyMasterBillList();
@@ -1324,6 +1305,25 @@ class OpdBillMasterReportView extends OpdBillMasterReport
                     $oldtbl = $doc->getTable();
                     $doc->setTable($opd_pharmacy_master_bill);
                     $opd_pharmacy_master_bill->exportDocument($doc, $rsdetail, 1, $detailcnt);
+                    $doc->setTable($oldtbl);
+                }
+                $doc->setStyle($exportStyle); // Restore
+            }
+        }
+
+        // Export detail records (opd_bill_total)
+        if (Config("EXPORT_DETAIL_RECORDS") && in_array("opd_bill_total", explode(",", $this->getCurrentDetailTable()))) {
+            $opd_bill_total = new OpdBillTotalList();
+            $rsdetail = $opd_bill_total->loadRs($opd_bill_total->getDetailFilterFromSession(), $opd_bill_total->getSessionOrderBy()); // Load detail records
+            if ($rsdetail) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("h"); // Change to horizontal
+                if (!$this->isExport("csv") || Config("EXPORT_DETAIL_RECORDS_FOR_CSV")) {
+                    $doc->exportEmptyRow();
+                    $detailcnt = $rsdetail->rowCount();
+                    $oldtbl = $doc->getTable();
+                    $doc->setTable($opd_bill_total);
+                    $opd_bill_total->exportDocument($doc, $rsdetail, 1, $detailcnt);
                     $doc->setTable($oldtbl);
                 }
                 $doc->setStyle($exportStyle); // Restore
@@ -1383,20 +1383,6 @@ class OpdBillMasterReportView extends OpdBillMasterReport
                     $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
                 }
             }
-            if (in_array("opd_radiology_master_bill", $detailTblVar)) {
-                $detailPageObj = Container("OpdRadiologyMasterBillGrid");
-                if ($detailPageObj->DetailView) {
-                    $detailPageObj->EventCancelled = $this->EventCancelled;
-                    $detailPageObj->CurrentMode = "view";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->visit_id->IsDetailKey = true;
-                    $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
-                }
-            }
             if (in_array("opd_pharmacy_master_bill", $detailTblVar)) {
                 $detailPageObj = Container("OpdPharmacyMasterBillGrid");
                 if ($detailPageObj->DetailView) {
@@ -1409,6 +1395,20 @@ class OpdBillMasterReportView extends OpdBillMasterReport
                     $detailPageObj->visit_id->IsDetailKey = true;
                     $detailPageObj->visit_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->visit_id->setSessionValue($detailPageObj->visit_id->CurrentValue);
+                }
+            }
+            if (in_array("opd_bill_total", $detailTblVar)) {
+                $detailPageObj = Container("OpdBillTotalGrid");
+                if ($detailPageObj->DetailView) {
+                    $detailPageObj->EventCancelled = $this->EventCancelled;
+                    $detailPageObj->CurrentMode = "view";
+
+                    // Save current master table to detail table
+                    $detailPageObj->setCurrentMasterTable($this->TableVar);
+                    $detailPageObj->setStartRecordNumber(1);
+                    $detailPageObj->id->IsDetailKey = true;
+                    $detailPageObj->id->CurrentValue = $this->id->CurrentValue;
+                    $detailPageObj->id->setSessionValue($detailPageObj->id->CurrentValue);
                 }
             }
         }

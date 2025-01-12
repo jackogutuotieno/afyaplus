@@ -133,6 +133,7 @@ class DoctorNotesDelete extends DoctorNotes
         $this->id->Visible = false;
         $this->patient_id->setVisibility();
         $this->visit_id->Visible = false;
+        $this->service_id->Visible = false;
         $this->chief_complaint->setVisibility();
         $this->history_of_presenting_illness->setVisibility();
         $this->past_medical_history->setVisibility();
@@ -640,6 +641,7 @@ class DoctorNotesDelete extends DoctorNotes
         $this->id->setDbValue($row['id']);
         $this->patient_id->setDbValue($row['patient_id']);
         $this->visit_id->setDbValue($row['visit_id']);
+        $this->service_id->setDbValue($row['service_id']);
         $this->chief_complaint->setDbValue($row['chief_complaint']);
         $this->history_of_presenting_illness->setDbValue($row['history_of_presenting_illness']);
         $this->past_medical_history->setDbValue($row['past_medical_history']);
@@ -657,6 +659,7 @@ class DoctorNotesDelete extends DoctorNotes
         $row['id'] = $this->id->DefaultValue;
         $row['patient_id'] = $this->patient_id->DefaultValue;
         $row['visit_id'] = $this->visit_id->DefaultValue;
+        $row['service_id'] = $this->service_id->DefaultValue;
         $row['chief_complaint'] = $this->chief_complaint->DefaultValue;
         $row['history_of_presenting_illness'] = $this->history_of_presenting_illness->DefaultValue;
         $row['past_medical_history'] = $this->past_medical_history->DefaultValue;
@@ -686,6 +689,9 @@ class DoctorNotesDelete extends DoctorNotes
 
         // visit_id
         $this->visit_id->CellCssStyle = "white-space: nowrap;";
+
+        // service_id
+        $this->service_id->CellCssStyle = "white-space: nowrap;";
 
         // chief_complaint
 

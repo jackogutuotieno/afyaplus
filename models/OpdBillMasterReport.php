@@ -430,12 +430,12 @@ class OpdBillMasterReport extends DbTable
             $detailUrl = Container("opd_lab_master_bill")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
-        if ($this->getCurrentDetailTable() == "opd_radiology_master_bill") {
-            $detailUrl = Container("opd_radiology_master_bill")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
         if ($this->getCurrentDetailTable() == "opd_pharmacy_master_bill") {
             $detailUrl = Container("opd_pharmacy_master_bill")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($this->getCurrentDetailTable() == "opd_bill_total") {
+            $detailUrl = Container("opd_bill_total")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
@@ -1764,7 +1764,7 @@ class OpdBillMasterReport extends DbTable
             $this->status->CellAttrs["style"] = "background-color: #ee881e; color: white";
             $this->status->ViewValue = "Billed"; 
         } 
-        $this->patient_name->ViewValue = '<a href="opdbillmasterreportview/' . $this->id->ViewValue . '?showdetail=opd_consultation,opd_lab_master_bill,opd_radiology_master_bill,opd_pharmacy_master_bill" target="_blank">' . $this->patient_name->ViewValue . '</a>';
+        $this->patient_name->ViewValue = '<a href="opdbillmasterreportview/' . $this->id->ViewValue . '?showdetail=opd_consultation,opd_lab_master_bill,opd_pharmacy_master_bill,opd_bill_total" target="_blank">' . $this->patient_name->ViewValue . '</a>';
     }
 
     // User ID Filtering event

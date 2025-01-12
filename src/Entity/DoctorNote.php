@@ -39,6 +39,9 @@ class DoctorNote extends AbstractEntity
     #[Column(name: "visit_id", type: "integer")]
     private int $visitId;
 
+    #[Column(name: "service_id", type: "integer")]
+    private int $serviceId;
+
     #[Column(name: "chief_complaint", type: "text")]
     private string $chiefComplaint;
 
@@ -62,6 +65,11 @@ class DoctorNote extends AbstractEntity
 
     #[Column(name: "date_updated", type: "datetime")]
     private DateTime $dateUpdated;
+
+    public function __construct()
+    {
+        $this->serviceId = 1;
+    }
 
     public function getId(): int
     {
@@ -93,6 +101,17 @@ class DoctorNote extends AbstractEntity
     public function setVisitId(int $value): static
     {
         $this->visitId = $value;
+        return $this;
+    }
+
+    public function getServiceId(): int
+    {
+        return $this->serviceId;
+    }
+
+    public function setServiceId(int $value): static
+    {
+        $this->serviceId = $value;
         return $this;
     }
 

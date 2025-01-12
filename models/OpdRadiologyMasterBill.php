@@ -117,7 +117,6 @@ class OpdRadiologyMasterBill extends DbTable
         $this->visit_id->InputTextType = "text";
         $this->visit_id->Raw = true;
         $this->visit_id->IsPrimaryKey = true; // Primary key field
-        $this->visit_id->IsForeignKey = true; // Foreign key field
         $this->visit_id->Nullable = false; // NOT NULL field
         $this->visit_id->Required = true; // Required field
         $this->visit_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -230,88 +229,6 @@ class OpdRadiologyMasterBill extends DbTable
             }
             $field->setSort($fldSort);
         }
-    }
-
-    // Current master table name
-    public function getCurrentMasterTable()
-    {
-        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
-    }
-
-    public function setCurrentMasterTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
-    }
-
-    // Get master WHERE clause from session values
-    public function getMasterFilterFromSession()
-    {
-        // Master filter
-        $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "opd_bill_master_report") {
-            $masterTable = Container("opd_bill_master_report");
-            if ($this->visit_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetKeyFilter($masterTable->id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $masterTable->Dbid);
-            } else {
-                return "";
-            }
-        }
-        return $masterFilter;
-    }
-
-    // Get detail WHERE clause from session values
-    public function getDetailFilterFromSession()
-    {
-        // Detail filter
-        $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "opd_bill_master_report") {
-            $masterTable = Container("opd_bill_master_report");
-            if ($this->visit_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetKeyFilter($this->visit_id, $this->visit_id->getSessionValue(), $masterTable->id->DataType, $this->Dbid);
-            } else {
-                return "";
-            }
-        }
-        return $detailFilter;
-    }
-
-    /**
-     * Get master filter
-     *
-     * @param object $masterTable Master Table
-     * @param array $keys Detail Keys
-     * @return mixed NULL is returned if all keys are empty, Empty string is returned if some keys are empty and is required
-     */
-    public function getMasterFilter($masterTable, $keys)
-    {
-        $validKeys = true;
-        switch ($masterTable->TableVar) {
-            case "opd_bill_master_report":
-                $key = $keys["visit_id"] ?? "";
-                if (EmptyValue($key)) {
-                    if ($masterTable->id->Required) { // Required field and empty value
-                        return ""; // Return empty filter
-                    }
-                    $validKeys = false;
-                } elseif (!$validKeys) { // Already has empty key
-                    return ""; // Return empty filter
-                }
-                if ($validKeys) {
-                    return GetKeyFilter($masterTable->id, $keys["visit_id"], $this->visit_id->DataType, $this->Dbid);
-                }
-                break;
-        }
-        return null; // All null values and no required fields
-    }
-
-    // Get detail filter
-    public function getDetailFilter($masterTable)
-    {
-        switch ($masterTable->TableVar) {
-            case "opd_bill_master_report":
-                return GetKeyFilter($this->visit_id, $masterTable->id->DbValue, $masterTable->id->DataType, $masterTable->Dbid);
-        }
-        return "";
     }
 
     // Render X Axis for chart
@@ -962,10 +879,6 @@ class OpdRadiologyMasterBill extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "opd_bill_master_report" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->visit_id->getSessionValue()); // Use Session Value
-        }
         return $url;
     }
 
