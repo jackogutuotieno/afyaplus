@@ -20716,7 +20716,8 @@ span span p {
   font-weight: 700;
 }
 
-.el_ipd_total_bill_total_bill span {
+.el_ipd_total_bill_total_bill span,
+.el_opd_bill_total_total_bll span {
   font-size: 2.5rem;
   font-weight: 700;
 }

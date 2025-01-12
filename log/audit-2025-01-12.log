@@ -6,3 +6,129 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-12 13:49:59",/afyaplus/login,2,login,::1,,,,
 "2025-01-12 13:57:56",/afyaplus/logout,2,logout,::1,,,,
 "2025-01-12 13:58:33",/afyaplus/login,1,login,::1,,,,
+"2025-01-12 14:05:52",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-12 14:06:07",/afyaplus/login,2,login,::1,,,,
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,first_name,10,,Gibert
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,last_name,10,,Doe
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,national_id,10,,6858393
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,date_of_birth,10,,1998-07-06
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,gender,10,,Male
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,phone,10,,0720801100
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,email_address,10,,gilber.doe@example.com
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,physical_address,10,,"<p>322 Maseno, Kenya.</p>"
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,employment_status,10,,Employed
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,marital_status,10,,Single
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,religion,10,,Christian
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,next_of_kin,10,,"Gilbert Doe Kin"
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,next_of_kin_phone,10,,0744332655
+"2025-01-12 14:09:45",/afyaplus/patientsadd,2,A,patients,id,10,,10
+"2025-01-12 14:12:01",/afyaplus/patientvisitsadd,2,A,patient_visits,patient_id,16,,10
+"2025-01-12 14:12:01",/afyaplus/patientvisitsadd,2,A,patient_visits,visit_type_id,16,,1
+"2025-01-12 14:12:01",/afyaplus/patientvisitsadd,2,A,patient_visits,payment_method_id,16,,1
+"2025-01-12 14:12:01",/afyaplus/patientvisitsadd,2,A,patient_visits,medical_scheme_id,16,,7
+"2025-01-12 14:12:01",/afyaplus/patientvisitsadd,2,A,patient_visits,user_role,16,,1
+"2025-01-12 14:12:01",/afyaplus/patientvisitsadd,2,A,patient_visits,id,16,,16
+"2025-01-12 14:12:54",/afyaplus/patientqueueadd,2,A,patient_queue,patient_id,30,,10
+"2025-01-12 14:12:54",/afyaplus/patientqueueadd,2,A,patient_queue,section,30,,Triage
+"2025-01-12 14:12:54",/afyaplus/patientqueueadd,2,A,patient_queue,status,30,,"Checked In"
+"2025-01-12 14:12:54",/afyaplus/patientqueueadd,2,A,patient_queue,visit_id,30,,16
+"2025-01-12 14:12:54",/afyaplus/patientqueueadd,2,A,patient_queue,id,30,,30
+"2025-01-12 14:13:19",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-12 14:13:39",/afyaplus/login,3,login,::1,,,,
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,patient_id,11,,10
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,height,11,,1.85
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,weight,11,,83
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,temperature,11,,37
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,pulse,11,,72
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,blood_pressure,11,,119/89
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,visit_id,11,,16
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,created_by_user_id,11,,3
+"2025-01-12 14:15:38",/afyaplus/patientvitalsadd,3,A,patient_vitals,id,11,,11
+"2025-01-12 14:17:00",/afyaplus/patientqueueadd,3,A,patient_queue,patient_id,31,,10
+"2025-01-12 14:17:00",/afyaplus/patientqueueadd,3,A,patient_queue,section,31,,Consultation
+"2025-01-12 14:17:00",/afyaplus/patientqueueadd,3,A,patient_queue,status,31,,"Vitals Taken"
+"2025-01-12 14:17:00",/afyaplus/patientqueueadd,3,A,patient_queue,visit_id,31,,16
+"2025-01-12 14:17:00",/afyaplus/patientqueueadd,3,A,patient_queue,id,31,,31
+"2025-01-12 14:17:19",/afyaplus/logout,3,logout,::1,,,,
+"2025-01-12 14:17:34",/afyaplus/login,4,login,::1,,,,
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,patient_id,11,,10
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,created_by_user_id,11,,4
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,visit_id,11,,16
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests,id,11,,11
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,"*** Batch insert begin ***",lab_test_requests_details,,,,
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,service_id,17,,24
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,lab_test_request_id,17,,11
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,id,17,,17
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,service_id,18,,12
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,lab_test_request_id,18,,11
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,A,lab_test_requests_details,id,18,,18
+"2025-01-12 14:19:18",/afyaplus/labtestrequestsadd,4,"*** Batch insert successful ***",lab_test_requests_details,,,,
+"2025-01-12 14:20:05",/afyaplus/labtestrequestsdetailsedit/17,4,U,lab_test_requests_details,service_id,17,24,17
+"2025-01-12 14:21:08",/afyaplus/logout,4,logout,::1,,,,
+"2025-01-12 14:21:17",/afyaplus/login,4,login,::1,,,,
+"2025-01-12 14:22:20",/afyaplus/patientqueueadd,4,A,patient_queue,patient_id,32,,10
+"2025-01-12 14:22:20",/afyaplus/patientqueueadd,4,A,patient_queue,section,32,,Laboratory
+"2025-01-12 14:22:20",/afyaplus/patientqueueadd,4,A,patient_queue,status,32,,"Doctor Consulted"
+"2025-01-12 14:22:20",/afyaplus/patientqueueadd,4,A,patient_queue,visit_id,32,,16
+"2025-01-12 14:22:20",/afyaplus/patientqueueadd,4,A,patient_queue,id,32,,32
+"2025-01-12 14:22:35",/afyaplus/logout,4,logout,::1,,,,
+"2025-01-12 14:22:51",/afyaplus/login,5,login,::1,,,,
+"2025-01-12 14:25:55",/afyaplus/labtestreportsadd,5,A,lab_test_reports,lab_test_request_id,7,,11
+"2025-01-12 14:25:55",/afyaplus/labtestreportsadd,5,A,lab_test_reports,details,7,,"<p>Submission for RF and hepatitis.</p>"
+"2025-01-12 14:25:55",/afyaplus/labtestreportsadd,5,A,lab_test_reports,created_by_user_id,7,,5
+"2025-01-12 14:25:55",/afyaplus/labtestreportsadd,5,A,lab_test_reports,id,7,,7
+"2025-01-12 14:28:43",/afyaplus/patientqueueadd,5,A,patient_queue,patient_id,33,,10
+"2025-01-12 14:28:43",/afyaplus/patientqueueadd,5,A,patient_queue,section,33,,Consultation
+"2025-01-12 14:28:43",/afyaplus/patientqueueadd,5,A,patient_queue,status,33,,"Tests Performed"
+"2025-01-12 14:28:43",/afyaplus/patientqueueadd,5,A,patient_queue,visit_id,33,,16
+"2025-01-12 14:28:43",/afyaplus/patientqueueadd,5,A,patient_queue,id,33,,33
+"2025-01-12 14:29:05",/afyaplus/logout,5,logout,::1,,,,
+"2025-01-12 14:29:23",/afyaplus/login,4,login,::1,,,,
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescriptions,patient_id,12,,10
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescriptions,created_by_user_id,12,,4
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescriptions,visit_id,12,,16
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescriptions,id,12,,12
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,"*** Batch insert begin ***",prescription_details,,,,
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,medicine_stock_id,12,,2
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,method,12,,Oral
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_quantity,12,,2
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_type,12,,grams
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,formulation,12,,Tabs
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,dose_interval,12,,"Once/Day (OD)"
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,number_of_days,12,,2
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,prescription_id,12,,12
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,A,prescription_details,id,12,,12
+"2025-01-12 14:33:10",/afyaplus/prescriptionsadd,4,"*** Batch insert successful ***",prescription_details,,,,
+"2025-01-12 14:34:27",/afyaplus/patientqueueadd,4,A,patient_queue,patient_id,34,,10
+"2025-01-12 14:34:27",/afyaplus/patientqueueadd,4,A,patient_queue,section,34,,Pharmacy
+"2025-01-12 14:34:27",/afyaplus/patientqueueadd,4,A,patient_queue,status,34,,"Medicines Prescribed"
+"2025-01-12 14:34:27",/afyaplus/patientqueueadd,4,A,patient_queue,visit_id,34,,16
+"2025-01-12 14:34:27",/afyaplus/patientqueueadd,4,A,patient_queue,id,34,,34
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,patient_id,8,,10
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,chief_complaint,8,,kefke
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,history_of_presenting_illness,8,,qpefeof
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,past_medical_history,8,,jqokwo
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,family_history,8,,jokde
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,allergies,8,,kowde
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,created_by_user_id,8,,4
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,visit_id,8,,16
+"2025-01-12 14:35:32",/afyaplus/doctornotesadd,4,A,doctor_notes,id,8,,8
+"2025-01-12 14:36:28",/afyaplus/logout,4,logout,::1,,,,
+"2025-01-12 14:36:42",/afyaplus/login,6,login,::1,,,,
+"2025-01-12 14:44:43",/afyaplus/logout,6,logout,::1,,,,
+"2025-01-12 14:44:53",/afyaplus/login,6,login,::1,,,,
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,patient_id,7,,10
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,prescription_id,7,,12
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,dispensation_type,7,,Internal
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,status,7,,Done
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,created_by_user_id,7,,6
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,visit_id,7,,16
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,id,7,,7
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,"*** Batch insert begin ***",medicine_dispensation_details,,,,
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_stock_id,7,,2
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,quantity,7,,2
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_dispensation_id,7,,7
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,7,,7
+"2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
+"2025-01-12 14:47:37",/afyaplus/logout,6,logout,::1,,,,
+"2025-01-12 14:48:24",/afyaplus/login,2,login,::1,,,,
