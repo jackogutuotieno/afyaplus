@@ -156,7 +156,7 @@ class IpdBillingReportList extends IpdBillingReport
         $this->company->Visible = false;
         $this->date_admitted->setVisibility();
         $this->date_discharged->setVisibility();
-        $this->total_days->setVisibility();
+        $this->total_days->Visible = false;
     }
 
     // Constructor
@@ -1401,15 +1401,6 @@ class IpdBillingReportList extends IpdBillingReport
         if ($filter != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->date_discharged->caption() . "</span>" . $captionSuffix . $filter . "</div>";
         }
-
-        // Field total_days
-        $filter = $this->queryBuilderWhere("total_days");
-        if (!$filter) {
-            $this->buildSearchSql($filter, $this->total_days, false, false);
-        }
-        if ($filter != "") {
-            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->total_days->caption() . "</span>" . $captionSuffix . $filter . "</div>";
-        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1592,7 +1583,6 @@ class IpdBillingReportList extends IpdBillingReport
             $this->updateSort($this->status); // status
             $this->updateSort($this->date_admitted); // date_admitted
             $this->updateSort($this->date_discharged); // date_discharged
-            $this->updateSort($this->total_days); // total_days
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -2031,7 +2021,6 @@ class IpdBillingReportList extends IpdBillingReport
             $this->createColumnOption($option, "status");
             $this->createColumnOption($option, "date_admitted");
             $this->createColumnOption($option, "date_discharged");
-            $this->createColumnOption($option, "total_days");
         }
 
         // Set up custom actions
@@ -2721,10 +2710,6 @@ class IpdBillingReportList extends IpdBillingReport
             // date_discharged
             $this->date_discharged->HrefValue = "";
             $this->date_discharged->TooltipValue = "";
-
-            // total_days
-            $this->total_days->HrefValue = "";
-            $this->total_days->TooltipValue = "";
         } elseif ($this->RowType == RowType::SEARCH) {
             // patient_uhid
             if ($this->patient_uhid->UseFilter && !EmptyValue($this->patient_uhid->AdvancedSearch->SearchValue)) {
@@ -2759,11 +2744,6 @@ class IpdBillingReportList extends IpdBillingReport
             $this->date_discharged->setupEditAttributes();
             $this->date_discharged->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->date_discharged->AdvancedSearch->SearchValue, $this->date_discharged->formatPattern()), $this->date_discharged->formatPattern()));
             $this->date_discharged->PlaceHolder = RemoveHtml($this->date_discharged->caption());
-
-            // total_days
-            $this->total_days->setupEditAttributes();
-            $this->total_days->EditValue = $this->total_days->AdvancedSearch->SearchValue;
-            $this->total_days->PlaceHolder = RemoveHtml($this->total_days->caption());
         }
 
         // Call Row Rendered event

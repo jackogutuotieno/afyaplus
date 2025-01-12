@@ -65,17 +65,6 @@ $ipd_billing_report->TableClass = "table table-bordered table-hover table-sm ew-
 </td>
         </tr>
 <?php } ?>
-<?php if ($ipd_billing_report->total_days->Visible) { // total_days ?>
-        <tr id="r_total_days"<?= $ipd_billing_report->total_days->rowAttributes() ?>>
-            <td class="<?= $ipd_billing_report->TableLeftColumnClass ?>"><?= $ipd_billing_report->total_days->caption() ?></td>
-            <td<?= $ipd_billing_report->total_days->cellAttributes() ?>>
-<span id="el_ipd_billing_report_total_days">
-<span<?= $ipd_billing_report->total_days->viewAttributes() ?>>
-<?= $ipd_billing_report->total_days->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
     </tbody>
 </table>
 </div>

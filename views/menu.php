@@ -8,8 +8,6 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
-$sideMenu->addMenuItem(1174, "mi_ipd_bed_charges", $Language->menuPhrase("1174", "MenuText"), "ipdbedchargeslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}ipd_bed_charges'), false, false, "", "", false, true);
-$sideMenu->addMenuItem(1175, "mi_ipd_total_bed_charges", $Language->menuPhrase("1175", "MenuText"), "ipdtotalbedchargeslist?cmd=resetall", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}ipd_total_bed_charges'), false, false, "", "", false, true);
 $sideMenu->addMenuItem(642, "mci_Dashboard", $Language->menuPhrase("642", "MenuText"), "", -1, "", true, false, true, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(325, "mi_Facility_Overview", $Language->menuPhrase("325", "MenuText"), "facilityoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Facility Overview'), false, false, "fa-tachometer", "", false, true);
 $sideMenu->addMenuItem(326, "mi_Front_Office_Overview", $Language->menuPhrase("326", "MenuText"), "frontofficeoverview", 642, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Front Office Overview'), false, false, "fa-tachometer", "", false, true);
