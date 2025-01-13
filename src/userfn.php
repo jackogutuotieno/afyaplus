@@ -195,7 +195,7 @@ function Container_Build($builder)
         $user_id = CurrentUserID();
 
         // Combine user first and last name to form complete name
-        $event["currentUserName"] =  'Welcome, ' . CurrentUserInfo("first_name") . ' ' . CurrentUserInfo("last_name");
+        $event["currentUserName"] =  '<span>Welcome,</span> ' . CurrentUserInfo("first_name") . ' ' . CurrentUserInfo("last_name");
     });
 }
 

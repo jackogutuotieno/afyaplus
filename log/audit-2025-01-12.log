@@ -132,3 +132,5 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-12 14:46:47",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
 "2025-01-12 14:47:37",/afyaplus/logout,6,logout,::1,,,,
 "2025-01-12 14:48:24",/afyaplus/login,2,login,::1,,,,
+"2025-01-12 15:28:30",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-12 19:04:08",/afyaplus/login,2,login,::1,,,,

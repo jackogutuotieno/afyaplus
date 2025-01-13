@@ -1,0 +1,4 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2025-01-13 01:55:33",/afyaplus/leaveapplicationsedit/3,2,U,leave_applications,start_from_date,3,,2025-01-13
+"2025-01-13 01:56:24",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-13 01:56:46",/afyaplus/login,1,login,::1,,,,

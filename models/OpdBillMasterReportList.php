@@ -780,14 +780,23 @@ class OpdBillMasterReportList extends OpdBillMasterReport
 
         // Get default search criteria
         AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
         // Get basic search values
         $this->loadBasicSearchValues();
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
 
         // Process filter list
         if ($this->processFilterList()) {
             $this->terminate();
             return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
         }
 
         // Restore search parms from Session if not searching / reset / export
@@ -806,6 +815,14 @@ class OpdBillMasterReportList extends OpdBillMasterReport
             $srchBasic = $this->basicSearchWhere();
         }
 
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
+
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
@@ -821,6 +838,16 @@ class OpdBillMasterReportList extends OpdBillMasterReport
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere(); // Save to session
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -1187,6 +1214,126 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->uhid, $default, false); // uhid
+        $this->buildSearchSql($where, $this->patient_name, $default, true); // patient_name
+        $this->buildSearchSql($where, $this->age, $default, false); // age
+        $this->buildSearchSql($where, $this->gender, $default, false); // gender
+        $this->buildSearchSql($where, $this->visit_type, $default, false); // visit_type
+        $this->buildSearchSql($where, $this->payment_method, $default, true); // payment_method
+        $this->buildSearchSql($where, $this->company, $default, true); // company
+        $this->buildSearchSql($where, $this->status, $default, false); // status
+        $this->buildSearchSql($where, $this->visit_date, $default, false); // visit_date
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->uhid->AdvancedSearch->save(); // uhid
+            $this->patient_name->AdvancedSearch->save(); // patient_name
+            $this->age->AdvancedSearch->save(); // age
+            $this->gender->AdvancedSearch->save(); // gender
+            $this->visit_type->AdvancedSearch->save(); // visit_type
+            $this->payment_method->AdvancedSearch->save(); // payment_method
+            $this->company->AdvancedSearch->save(); // company
+            $this->status->AdvancedSearch->save(); // status
+            $this->visit_date->AdvancedSearch->save(); // visit_date
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->uhid->AdvancedSearch->save(); // uhid
+            $this->patient_name->AdvancedSearch->save(); // patient_name
+            $this->age->AdvancedSearch->save(); // age
+            $this->gender->AdvancedSearch->save(); // gender
+            $this->visit_type->AdvancedSearch->save(); // visit_type
+            $this->payment_method->AdvancedSearch->save(); // payment_method
+            $this->company->AdvancedSearch->save(); // company
+            $this->status->AdvancedSearch->save(); // status
+            $this->visit_date->AdvancedSearch->save(); // visit_date
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
+    }
+
     // Show list of filters
     public function showFilterList()
     {
@@ -1196,6 +1343,51 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         $filterList = "";
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field patient_name
+        $filter = $this->queryBuilderWhere("patient_name");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->patient_name, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->patient_name->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field payment_method
+        $filter = $this->queryBuilderWhere("payment_method");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->payment_method, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->payment_method->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field company
+        $filter = $this->queryBuilderWhere("company");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->company, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->company->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field status
+        $filter = $this->queryBuilderWhere("status");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->status, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->status->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field visit_date
+        $filter = $this->queryBuilderWhere("visit_date");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->visit_date, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->visit_date->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1256,6 +1448,36 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->uhid->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->patient_name->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->age->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->gender->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->visit_type->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->payment_method->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->company->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->status->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->visit_date->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1268,6 +1490,12 @@ class OpdBillMasterReportList extends OpdBillMasterReport
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
     }
 
     // Load advanced search default values
@@ -1282,6 +1510,21 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->uhid->AdvancedSearch->unsetSession();
+        $this->patient_name->AdvancedSearch->unsetSession();
+        $this->age->AdvancedSearch->unsetSession();
+        $this->gender->AdvancedSearch->unsetSession();
+        $this->visit_type->AdvancedSearch->unsetSession();
+        $this->payment_method->AdvancedSearch->unsetSession();
+        $this->company->AdvancedSearch->unsetSession();
+        $this->status->AdvancedSearch->unsetSession();
+        $this->visit_date->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1289,6 +1532,18 @@ class OpdBillMasterReportList extends OpdBillMasterReport
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->uhid->AdvancedSearch->load();
+        $this->patient_name->AdvancedSearch->load();
+        $this->age->AdvancedSearch->load();
+        $this->gender->AdvancedSearch->load();
+        $this->visit_type->AdvancedSearch->load();
+        $this->payment_method->AdvancedSearch->load();
+        $this->company->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
+        $this->visit_date->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -2056,6 +2311,101 @@ class OpdBillMasterReportList extends OpdBillMasterReport
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // uhid
+        if ($this->uhid->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->uhid->AdvancedSearch->SearchValue != "" || $this->uhid->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // patient_name
+        if ($this->patient_name->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->patient_name->AdvancedSearch->SearchValue != "" || $this->patient_name->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // age
+        if ($this->age->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->age->AdvancedSearch->SearchValue != "" || $this->age->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // gender
+        if ($this->gender->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->gender->AdvancedSearch->SearchValue != "" || $this->gender->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // visit_type
+        if ($this->visit_type->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->visit_type->AdvancedSearch->SearchValue != "" || $this->visit_type->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // payment_method
+        if ($this->payment_method->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->payment_method->AdvancedSearch->SearchValue != "" || $this->payment_method->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // company
+        if ($this->company->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->company->AdvancedSearch->SearchValue != "" || $this->company->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // status
+        if ($this->status->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->status->AdvancedSearch->SearchValue != "" || $this->status->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // visit_date
+        if ($this->visit_date->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->visit_date->AdvancedSearch->SearchValue != "" || $this->visit_date->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
     /**
      * Load result set
      *
@@ -2288,12 +2638,84 @@ class OpdBillMasterReportList extends OpdBillMasterReport
             // visit_date
             $this->visit_date->HrefValue = "";
             $this->visit_date->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // patient_name
+            if ($this->patient_name->UseFilter && !EmptyValue($this->patient_name->AdvancedSearch->SearchValue)) {
+                if (is_array($this->patient_name->AdvancedSearch->SearchValue)) {
+                    $this->patient_name->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_name->AdvancedSearch->SearchValue);
+                }
+                $this->patient_name->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->patient_name->AdvancedSearch->SearchValue);
+            }
+
+            // payment_method
+            if ($this->payment_method->UseFilter && !EmptyValue($this->payment_method->AdvancedSearch->SearchValue)) {
+                if (is_array($this->payment_method->AdvancedSearch->SearchValue)) {
+                    $this->payment_method->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method->AdvancedSearch->SearchValue);
+                }
+                $this->payment_method->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->payment_method->AdvancedSearch->SearchValue);
+            }
+
+            // company
+            if ($this->company->UseFilter && !EmptyValue($this->company->AdvancedSearch->SearchValue)) {
+                if (is_array($this->company->AdvancedSearch->SearchValue)) {
+                    $this->company->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->company->AdvancedSearch->SearchValue);
+                }
+                $this->company->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->company->AdvancedSearch->SearchValue);
+            }
+
+            // status
+            $this->status->setupEditAttributes();
+            if (!$this->status->Raw) {
+                $this->status->AdvancedSearch->SearchValue = HtmlDecode($this->status->AdvancedSearch->SearchValue);
+            }
+            $this->status->EditValue = HtmlEncode($this->status->AdvancedSearch->SearchValue);
+            $this->status->PlaceHolder = RemoveHtml($this->status->caption());
+
+            // visit_date
+            $this->visit_date->setupEditAttributes();
+            $this->visit_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->visit_date->AdvancedSearch->SearchValue, $this->visit_date->formatPattern()), $this->visit_date->formatPattern()));
+            $this->visit_date->PlaceHolder = RemoveHtml($this->visit_date->caption());
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->uhid->AdvancedSearch->load();
+        $this->patient_name->AdvancedSearch->load();
+        $this->age->AdvancedSearch->load();
+        $this->gender->AdvancedSearch->load();
+        $this->visit_type->AdvancedSearch->load();
+        $this->payment_method->AdvancedSearch->load();
+        $this->company->AdvancedSearch->load();
+        $this->status->AdvancedSearch->load();
+        $this->visit_date->AdvancedSearch->load();
     }
 
     // Get export HTML tag

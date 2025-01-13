@@ -3331,11 +3331,15 @@ span span p {
 	font-size: 2.5rem;
 	font-weight: 700;
 }
-#gmp_ipd_billing_report .dropdown-toggle {
+#gmp_ipd_billing_report .dropdown-toggle,
+#gmp_opd_bill_master_report .dropdown-toggle {
 	display: none;
 }
 .medicine-ipd-dispensation .ew-list-options .ew-add {
 	display: none;
+}
+.user-panel a span {
+	display: block;
 }
 
 /*END_USER_STYLES*/

@@ -176,6 +176,8 @@ class OpdBillMasterReport extends DbTable
             'TEXT' // Edit Tag
         );
         $this->patient_name->InputTextType = "text";
+        $this->patient_name->UseFilter = true; // Table header filter
+        $this->patient_name->Lookup = new Lookup($this->patient_name, 'opd_bill_master_report', true, 'patient_name', ["patient_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->patient_name->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['patient_name'] = &$this->patient_name;
 
@@ -272,6 +274,8 @@ class OpdBillMasterReport extends DbTable
         $this->payment_method->InputTextType = "text";
         $this->payment_method->Nullable = false; // NOT NULL field
         $this->payment_method->Required = true; // Required field
+        $this->payment_method->UseFilter = true; // Table header filter
+        $this->payment_method->Lookup = new Lookup($this->payment_method, 'opd_bill_master_report', true, 'payment_method', ["payment_method","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->payment_method->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['payment_method'] = &$this->payment_method;
 
@@ -296,6 +300,8 @@ class OpdBillMasterReport extends DbTable
         $this->company->InputTextType = "text";
         $this->company->Nullable = false; // NOT NULL field
         $this->company->Required = true; // Required field
+        $this->company->UseFilter = true; // Table header filter
+        $this->company->Lookup = new Lookup($this->company, 'opd_bill_master_report', true, 'company', ["company","","",""], '', '', [], [], [], [], [], [], false, '', '', "");
         $this->company->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
         $this->Fields['company'] = &$this->company;
 
