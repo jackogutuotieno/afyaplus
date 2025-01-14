@@ -131,6 +131,8 @@ class BedsDelete extends Beds
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->floor_id->setVisibility();
+        $this->ward_type_id->setVisibility();
         $this->ward_id->setVisibility();
         $this->bed_name->setVisibility();
         $this->bed_charges->setVisibility();
@@ -425,6 +427,8 @@ class BedsDelete extends Beds
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->floor_id);
+        $this->setupLookupOptions($this->ward_type_id);
         $this->setupLookupOptions($this->ward_id);
 
         // Set up master/detail parameters
@@ -613,6 +617,8 @@ class BedsDelete extends Beds
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
+        $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_id->setDbValue($row['ward_id']);
         $this->bed_name->setDbValue($row['bed_name']);
         $this->bed_charges->setDbValue($row['bed_charges']);
@@ -625,6 +631,8 @@ class BedsDelete extends Beds
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['floor_id'] = $this->floor_id->DefaultValue;
+        $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
         $row['ward_id'] = $this->ward_id->DefaultValue;
         $row['bed_name'] = $this->bed_name->DefaultValue;
         $row['bed_charges'] = $this->bed_charges->DefaultValue;
@@ -647,6 +655,10 @@ class BedsDelete extends Beds
 
         // id
 
+        // floor_id
+
+        // ward_type_id
+
         // ward_id
 
         // bed_name
@@ -661,6 +673,52 @@ class BedsDelete extends Beds
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // floor_id
+            $curVal = strval($this->floor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+                if ($this->floor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                    } else {
+                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->floor_id->ViewValue = null;
+            }
+
+            // ward_type_id
+            $curVal = strval($this->ward_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
+                if ($this->ward_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->ward_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->ward_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->ward_type_id->ViewValue = $this->ward_type_id->displayValue($arwrk);
+                    } else {
+                        $this->ward_type_id->ViewValue = FormatNumber($this->ward_type_id->CurrentValue, $this->ward_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->ward_type_id->ViewValue = null;
+            }
 
             // ward_id
             $curVal = strval($this->ward_id->CurrentValue);
@@ -699,6 +757,14 @@ class BedsDelete extends Beds
             // date_updated
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
+
+            // floor_id
+            $this->floor_id->HrefValue = "";
+            $this->floor_id->TooltipValue = "";
+
+            // ward_type_id
+            $this->ward_type_id->HrefValue = "";
+            $this->ward_type_id->TooltipValue = "";
 
             // ward_id
             $this->ward_id->HrefValue = "";
@@ -944,6 +1010,10 @@ class BedsDelete extends Beds
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_floor_id":
+                    break;
+                case "x_ward_type_id":
+                    break;
                 case "x_ward_id":
                     break;
                 default:

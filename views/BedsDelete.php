@@ -50,6 +50,12 @@ $Page->showMessage();
 <table class="<?= $Page->TableClass ?>">
     <thead>
     <tr class="ew-table-header">
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <th class="<?= $Page->floor_id->headerCellClass() ?>"><span id="elh_beds_floor_id" class="beds_floor_id"><?= $Page->floor_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
+        <th class="<?= $Page->ward_type_id->headerCellClass() ?>"><span id="elh_beds_ward_type_id" class="beds_ward_type_id"><?= $Page->ward_type_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->ward_id->Visible) { // ward_id ?>
         <th class="<?= $Page->ward_id->headerCellClass() ?>"><span id="elh_beds_ward_id" class="beds_ward_id"><?= $Page->ward_id->caption() ?></span></th>
 <?php } ?>
@@ -80,6 +86,22 @@ while ($Page->fetch()) {
     $Page->renderRow();
 ?>
     <tr <?= $Page->rowAttributes() ?>>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <td<?= $Page->floor_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->floor_id->viewAttributes() ?>>
+<?= $Page->floor_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
+        <td<?= $Page->ward_type_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->ward_type_id->viewAttributes() ?>>
+<?= $Page->ward_type_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->ward_id->Visible) { // ward_id ?>
         <td<?= $Page->ward_id->cellAttributes() ?>>
 <span id="">

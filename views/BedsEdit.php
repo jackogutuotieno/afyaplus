@@ -29,6 +29,8 @@ loadjs.ready(["wrapper", "head"], function () {
         // Add fields
         .setFields([
             ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+            ["floor_id", [fields.floor_id.visible && fields.floor_id.required ? ew.Validators.required(fields.floor_id.caption) : null], fields.floor_id.isInvalid],
+            ["ward_type_id", [fields.ward_type_id.visible && fields.ward_type_id.required ? ew.Validators.required(fields.ward_type_id.caption) : null], fields.ward_type_id.isInvalid],
             ["ward_id", [fields.ward_id.visible && fields.ward_id.required ? ew.Validators.required(fields.ward_id.caption) : null], fields.ward_id.isInvalid],
             ["bed_name", [fields.bed_name.visible && fields.bed_name.required ? ew.Validators.required(fields.bed_name.caption) : null], fields.bed_name.isInvalid],
             ["bed_charges", [fields.bed_charges.visible && fields.bed_charges.required ? ew.Validators.required(fields.bed_charges.caption) : null, ew.Validators.float], fields.bed_charges.isInvalid]
@@ -47,6 +49,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "floor_id": <?= $Page->floor_id->toClientList($Page) ?>,
+            "ward_type_id": <?= $Page->ward_type_id->toClientList($Page) ?>,
             "ward_id": <?= $Page->ward_id->toClientList($Page) ?>,
         })
         .build();
@@ -84,6 +88,99 @@ loadjs.ready("head", function () {
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 <input type="hidden" data-table="beds" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+    <div id="r_floor_id"<?= $Page->floor_id->rowAttributes() ?>>
+        <label id="elh_beds_floor_id" for="x_floor_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->floor_id->caption() ?><?= $Page->floor_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->floor_id->cellAttributes() ?>>
+<span id="el_beds_floor_id">
+    <select
+        id="x_floor_id"
+        name="x_floor_id"
+        class="form-select ew-select<?= $Page->floor_id->isInvalidClass() ?>"
+        <?php if (!$Page->floor_id->IsNativeSelect) { ?>
+        data-select2-id="fbedsedit_x_floor_id"
+        <?php } ?>
+        data-table="beds"
+        data-field="x_floor_id"
+        data-value-separator="<?= $Page->floor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->floor_id->getPlaceHolder()) ?>"
+        data-ew-action="update-options"
+        <?= $Page->floor_id->editAttributes() ?>>
+        <?= $Page->floor_id->selectOptionListHtml("x_floor_id") ?>
+    </select>
+    <?= $Page->floor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->floor_id->getErrorMessage() ?></div>
+<?= $Page->floor_id->Lookup->getParamTag($Page, "p_x_floor_id") ?>
+<?php if (!$Page->floor_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fbedsedit", function() {
+    var options = { name: "x_floor_id", selectId: "fbedsedit_x_floor_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fbedsedit.lists.floor_id?.lookupOptions.length) {
+        options.data = { id: "x_floor_id", form: "fbedsedit" };
+    } else {
+        options.ajax = { id: "x_floor_id", form: "fbedsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.beds.fields.floor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
+    <div id="r_ward_type_id"<?= $Page->ward_type_id->rowAttributes() ?>>
+        <label id="elh_beds_ward_type_id" for="x_ward_type_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->ward_type_id->caption() ?><?= $Page->ward_type_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->ward_type_id->cellAttributes() ?>>
+<span id="el_beds_ward_type_id">
+    <select
+        id="x_ward_type_id"
+        name="x_ward_type_id"
+        class="form-select ew-select<?= $Page->ward_type_id->isInvalidClass() ?>"
+        <?php if (!$Page->ward_type_id->IsNativeSelect) { ?>
+        data-select2-id="fbedsedit_x_ward_type_id"
+        <?php } ?>
+        data-table="beds"
+        data-field="x_ward_type_id"
+        data-value-separator="<?= $Page->ward_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->ward_type_id->getPlaceHolder()) ?>"
+        <?= $Page->ward_type_id->editAttributes() ?>>
+        <?= $Page->ward_type_id->selectOptionListHtml("x_ward_type_id") ?>
+    </select>
+    <?= $Page->ward_type_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->ward_type_id->getErrorMessage() ?></div>
+<?= $Page->ward_type_id->Lookup->getParamTag($Page, "p_x_ward_type_id") ?>
+<?php if (!$Page->ward_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fbedsedit", function() {
+    var options = { name: "x_ward_type_id", selectId: "fbedsedit_x_ward_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fbedsedit.lists.ward_type_id?.lookupOptions.length) {
+        options.data = { id: "x_ward_type_id", form: "fbedsedit" };
+    } else {
+        options.ajax = { id: "x_ward_type_id", form: "fbedsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.beds.fields.ward_type_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

@@ -23,6 +23,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Add fields
         .setFields([
+            ["floor_id", [fields.floor_id.visible && fields.floor_id.required ? ew.Validators.required(fields.floor_id.caption) : null], fields.floor_id.isInvalid],
+            ["ward_type_id", [fields.ward_type_id.visible && fields.ward_type_id.required ? ew.Validators.required(fields.ward_type_id.caption) : null], fields.ward_type_id.isInvalid],
             ["ward_id", [fields.ward_id.visible && fields.ward_id.required ? ew.Validators.required(fields.ward_id.caption) : null], fields.ward_id.isInvalid],
             ["bed_name", [fields.bed_name.visible && fields.bed_name.required ? ew.Validators.required(fields.bed_name.caption) : null], fields.bed_name.isInvalid],
             ["bed_charges", [fields.bed_charges.visible && fields.bed_charges.required ? ew.Validators.required(fields.bed_charges.caption) : null, ew.Validators.float], fields.bed_charges.isInvalid]
@@ -32,7 +34,7 @@ loadjs.ready(["wrapper", "head"], function () {
         .setEmptyRow(
             function (rowIndex) {
                 let fobj = this.getForm(),
-                    fields = [["ward_id",false],["bed_name",false],["bed_charges",false]];
+                    fields = [["floor_id",false],["ward_type_id",false],["ward_id",false],["bed_name",false],["bed_charges",false]];
                 if (fields.some(field => ew.valueChanged(fobj, rowIndex, ...field)))
                     return false;
                 return true;
@@ -52,6 +54,8 @@ loadjs.ready(["wrapper", "head"], function () {
 
         // Dynamic selection lists
         .setLists({
+            "floor_id": <?= $Grid->floor_id->toClientList($Grid) ?>,
+            "ward_type_id": <?= $Grid->ward_type_id->toClientList($Grid) ?>,
             "ward_id": <?= $Grid->ward_id->toClientList($Grid) ?>,
         })
         .build();
@@ -87,6 +91,12 @@ $Grid->renderListOptions();
 // Render list options (header, left)
 $Grid->ListOptions->render("header", "left");
 ?>
+<?php if ($Grid->floor_id->Visible) { // floor_id ?>
+        <th data-name="floor_id" class="<?= $Grid->floor_id->headerCellClass() ?>"><div id="elh_beds_floor_id" class="beds_floor_id"><?= $Grid->renderFieldHeader($Grid->floor_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->ward_type_id->Visible) { // ward_type_id ?>
+        <th data-name="ward_type_id" class="<?= $Grid->ward_type_id->headerCellClass() ?>"><div id="elh_beds_ward_type_id" class="beds_ward_type_id"><?= $Grid->renderFieldHeader($Grid->ward_type_id) ?></div></th>
+<?php } ?>
 <?php if ($Grid->ward_id->Visible) { // ward_id ?>
         <th data-name="ward_id" class="<?= $Grid->ward_id->headerCellClass() ?>"><div id="elh_beds_ward_id" class="beds_ward_id"><?= $Grid->renderFieldHeader($Grid->ward_id) ?></div></th>
 <?php } ?>
@@ -132,6 +142,198 @@ while ($Grid->RecordCount < $Grid->StopRecord || $Grid->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 ?>
+    <?php if ($Grid->floor_id->Visible) { // floor_id ?>
+        <td data-name="floor_id"<?= $Grid->floor_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_beds_floor_id" class="el_beds_floor_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_floor_id"
+        name="x<?= $Grid->RowIndex ?>_floor_id"
+        class="form-select ew-select<?= $Grid->floor_id->isInvalidClass() ?>"
+        <?php if (!$Grid->floor_id->IsNativeSelect) { ?>
+        data-select2-id="fbedsgrid_x<?= $Grid->RowIndex ?>_floor_id"
+        <?php } ?>
+        data-table="beds"
+        data-field="x_floor_id"
+        data-value-separator="<?= $Grid->floor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->floor_id->getPlaceHolder()) ?>"
+        data-ew-action="update-options"
+        <?= $Grid->floor_id->editAttributes() ?>>
+        <?= $Grid->floor_id->selectOptionListHtml("x{$Grid->RowIndex}_floor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->floor_id->getErrorMessage() ?></div>
+<?= $Grid->floor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_floor_id") ?>
+<?php if (!$Grid->floor_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fbedsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_floor_id", selectId: "fbedsgrid_x<?= $Grid->RowIndex ?>_floor_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fbedsgrid.lists.floor_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_floor_id", form: "fbedsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_floor_id", form: "fbedsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.beds.fields.floor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="beds" data-field="x_floor_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_floor_id" id="o<?= $Grid->RowIndex ?>_floor_id" value="<?= HtmlEncode($Grid->floor_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_beds_floor_id" class="el_beds_floor_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_floor_id"
+        name="x<?= $Grid->RowIndex ?>_floor_id"
+        class="form-select ew-select<?= $Grid->floor_id->isInvalidClass() ?>"
+        <?php if (!$Grid->floor_id->IsNativeSelect) { ?>
+        data-select2-id="fbedsgrid_x<?= $Grid->RowIndex ?>_floor_id"
+        <?php } ?>
+        data-table="beds"
+        data-field="x_floor_id"
+        data-value-separator="<?= $Grid->floor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->floor_id->getPlaceHolder()) ?>"
+        data-ew-action="update-options"
+        <?= $Grid->floor_id->editAttributes() ?>>
+        <?= $Grid->floor_id->selectOptionListHtml("x{$Grid->RowIndex}_floor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->floor_id->getErrorMessage() ?></div>
+<?= $Grid->floor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_floor_id") ?>
+<?php if (!$Grid->floor_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fbedsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_floor_id", selectId: "fbedsgrid_x<?= $Grid->RowIndex ?>_floor_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fbedsgrid.lists.floor_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_floor_id", form: "fbedsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_floor_id", form: "fbedsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.beds.fields.floor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_beds_floor_id" class="el_beds_floor_id">
+<span<?= $Grid->floor_id->viewAttributes() ?>>
+<?= $Grid->floor_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="beds" data-field="x_floor_id" data-hidden="1" name="fbedsgrid$x<?= $Grid->RowIndex ?>_floor_id" id="fbedsgrid$x<?= $Grid->RowIndex ?>_floor_id" value="<?= HtmlEncode($Grid->floor_id->FormValue) ?>">
+<input type="hidden" data-table="beds" data-field="x_floor_id" data-hidden="1" data-old name="fbedsgrid$o<?= $Grid->RowIndex ?>_floor_id" id="fbedsgrid$o<?= $Grid->RowIndex ?>_floor_id" value="<?= HtmlEncode($Grid->floor_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->ward_type_id->Visible) { // ward_type_id ?>
+        <td data-name="ward_type_id"<?= $Grid->ward_type_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == RowType::ADD) { // Add record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_beds_ward_type_id" class="el_beds_ward_type_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_ward_type_id"
+        name="x<?= $Grid->RowIndex ?>_ward_type_id"
+        class="form-select ew-select<?= $Grid->ward_type_id->isInvalidClass() ?>"
+        <?php if (!$Grid->ward_type_id->IsNativeSelect) { ?>
+        data-select2-id="fbedsgrid_x<?= $Grid->RowIndex ?>_ward_type_id"
+        <?php } ?>
+        data-table="beds"
+        data-field="x_ward_type_id"
+        data-value-separator="<?= $Grid->ward_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->ward_type_id->getPlaceHolder()) ?>"
+        <?= $Grid->ward_type_id->editAttributes() ?>>
+        <?= $Grid->ward_type_id->selectOptionListHtml("x{$Grid->RowIndex}_ward_type_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->ward_type_id->getErrorMessage() ?></div>
+<?= $Grid->ward_type_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_ward_type_id") ?>
+<?php if (!$Grid->ward_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fbedsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_ward_type_id", selectId: "fbedsgrid_x<?= $Grid->RowIndex ?>_ward_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fbedsgrid.lists.ward_type_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_ward_type_id", form: "fbedsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_ward_type_id", form: "fbedsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.beds.fields.ward_type_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="beds" data-field="x_ward_type_id" data-hidden="1" data-old name="o<?= $Grid->RowIndex ?>_ward_type_id" id="o<?= $Grid->RowIndex ?>_ward_type_id" value="<?= HtmlEncode($Grid->ward_type_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == RowType::EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_beds_ward_type_id" class="el_beds_ward_type_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_ward_type_id"
+        name="x<?= $Grid->RowIndex ?>_ward_type_id"
+        class="form-select ew-select<?= $Grid->ward_type_id->isInvalidClass() ?>"
+        <?php if (!$Grid->ward_type_id->IsNativeSelect) { ?>
+        data-select2-id="fbedsgrid_x<?= $Grid->RowIndex ?>_ward_type_id"
+        <?php } ?>
+        data-table="beds"
+        data-field="x_ward_type_id"
+        data-value-separator="<?= $Grid->ward_type_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->ward_type_id->getPlaceHolder()) ?>"
+        <?= $Grid->ward_type_id->editAttributes() ?>>
+        <?= $Grid->ward_type_id->selectOptionListHtml("x{$Grid->RowIndex}_ward_type_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->ward_type_id->getErrorMessage() ?></div>
+<?= $Grid->ward_type_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_ward_type_id") ?>
+<?php if (!$Grid->ward_type_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fbedsgrid", function() {
+    var options = { name: "x<?= $Grid->RowIndex ?>_ward_type_id", selectId: "fbedsgrid_x<?= $Grid->RowIndex ?>_ward_type_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fbedsgrid.lists.ward_type_id?.lookupOptions.length) {
+        options.data = { id: "x<?= $Grid->RowIndex ?>_ward_type_id", form: "fbedsgrid" };
+    } else {
+        options.ajax = { id: "x<?= $Grid->RowIndex ?>_ward_type_id", form: "fbedsgrid", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.beds.fields.ward_type_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == RowType::VIEW) { // View record ?>
+<span id="el<?= $Grid->RowIndex == '$rowindex$' ? '$rowindex$' : $Grid->RowCount ?>_beds_ward_type_id" class="el_beds_ward_type_id">
+<span<?= $Grid->ward_type_id->viewAttributes() ?>>
+<?= $Grid->ward_type_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="beds" data-field="x_ward_type_id" data-hidden="1" name="fbedsgrid$x<?= $Grid->RowIndex ?>_ward_type_id" id="fbedsgrid$x<?= $Grid->RowIndex ?>_ward_type_id" value="<?= HtmlEncode($Grid->ward_type_id->FormValue) ?>">
+<input type="hidden" data-table="beds" data-field="x_ward_type_id" data-hidden="1" data-old name="fbedsgrid$o<?= $Grid->RowIndex ?>_ward_type_id" id="fbedsgrid$o<?= $Grid->RowIndex ?>_ward_type_id" value="<?= HtmlEncode($Grid->ward_type_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->ward_id->Visible) { // ward_id ?>
         <td data-name="ward_id"<?= $Grid->ward_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == RowType::ADD) { // Add record ?>

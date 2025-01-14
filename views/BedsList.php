@@ -22,6 +22,13 @@ loadjs.ready(["wrapper", "head"], function () {
         .setPageId("list")
         .setSubmitWithFetch(<?= $Page->UseAjaxActions ? "true" : "false" ?>)
         .setFormKeyCountName("<?= $Page->FormKeyCountName ?>")
+
+        // Dynamic selection lists
+        .setLists({
+            "floor_id": <?= $Page->floor_id->toClientList($Page) ?>,
+            "ward_type_id": <?= $Page->ward_type_id->toClientList($Page) ?>,
+            "ward_id": <?= $Page->ward_id->toClientList($Page) ?>,
+        })
         .build();
     window[form.id] = form;
     currentForm = form;
@@ -65,6 +72,9 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "wards") {
 }
 ?>
 <?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->showFilterList() ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <form name="fbedssrch" id="fbedssrch" class="ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>" novalidate autocomplete="off">
 <div id="fbedssrch_search_panel" class="mb-2 mb-sm-0 <?= $Page->SearchPanelClass ?>"><!-- .ew-search-panel -->
@@ -85,8 +95,45 @@ loadjs.ready(["wrapper", "head"], function () {
         .setSubmitWithFetch(true)
 <?php } ?>
 
+        // Add fields
+        .addFields([
+        ])
+        // Validate form
+        .setValidate(
+            async function () {
+                if (!this.validateRequired)
+                    return true; // Ignore validation
+                let fobj = this.getForm();
+
+                // Validate fields
+                if (!this.validateFields())
+                    return false;
+
+                // Call Form_CustomValidate event
+                if (!(await this.customValidate?.(fobj) ?? true)) {
+                    this.focus();
+                    return false;
+                }
+                return true;
+            }
+        )
+
+        // Form_CustomValidate
+        .setCustomValidate(
+            function (fobj) { // DO NOT CHANGE THIS LINE! (except for adding "async" keyword)!
+                    // Your custom validation code in JAVASCRIPT here, return false if invalid.
+                    return true;
+                }
+        )
+
+        // Use JavaScript validation or not
+        .setValidateRequired(ew.CLIENT_VALIDATE)
+
         // Dynamic selection lists
         .setLists({
+            "floor_id": <?= $Page->floor_id->toClientList($Page) ?>,
+            "ward_type_id": <?= $Page->ward_type_id->toClientList($Page) ?>,
+            "ward_id": <?= $Page->ward_id->toClientList($Page) ?>,
         })
 
         // Filters
@@ -101,6 +148,128 @@ loadjs.ready(["wrapper", "head"], function () {
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !($Page->CurrentAction && $Page->CurrentAction != "search") && $Page->hasSearchFields()) { ?>
 <div class="ew-extended-search container-fluid ps-2">
+<div class="row mb-0<?= ($Page->SearchFieldsPerRow > 0) ? " row-cols-sm-" . $Page->SearchFieldsPerRow : "" ?>">
+<?php
+// Render search row
+$Page->RowType = RowType::SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+<?php
+if (!$Page->floor_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_floor_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->floor_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_floor_id"
+            name="x_floor_id[]"
+            class="form-control ew-select<?= $Page->floor_id->isInvalidClass() ?>"
+            data-select2-id="fbedssrch_x_floor_id"
+            data-table="beds"
+            data-field="x_floor_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->floor_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->floor_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->floor_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->floor_id->editAttributes() ?>>
+            <?= $Page->floor_id->selectOptionListHtml("x_floor_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->floor_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fbedssrch", function() {
+            var options = {
+                name: "x_floor_id",
+                selectId: "fbedssrch_x_floor_id",
+                ajax: { id: "x_floor_id", form: "fbedssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.beds.fields.floor_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
+<?php
+if (!$Page->ward_type_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_ward_type_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->ward_type_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_ward_type_id"
+            name="x_ward_type_id[]"
+            class="form-control ew-select<?= $Page->ward_type_id->isInvalidClass() ?>"
+            data-select2-id="fbedssrch_x_ward_type_id"
+            data-table="beds"
+            data-field="x_ward_type_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->ward_type_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->ward_type_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->ward_type_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->ward_type_id->editAttributes() ?>>
+            <?= $Page->ward_type_id->selectOptionListHtml("x_ward_type_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->ward_type_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fbedssrch", function() {
+            var options = {
+                name: "x_ward_type_id",
+                selectId: "fbedssrch_x_ward_type_id",
+                ajax: { id: "x_ward_type_id", form: "fbedssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.beds.fields.ward_type_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+<?php if ($Page->ward_id->Visible) { // ward_id ?>
+<?php
+if (!$Page->ward_id->UseFilter) {
+    $Page->SearchColumnCount++;
+}
+?>
+    <div id="xs_ward_id" class="col-sm-auto d-sm-flex align-items-start mb-3 px-0 pe-sm-2<?= $Page->ward_id->UseFilter ? " ew-filter-field" : "" ?>">
+        <select
+            id="x_ward_id"
+            name="x_ward_id[]"
+            class="form-control ew-select<?= $Page->ward_id->isInvalidClass() ?>"
+            data-select2-id="fbedssrch_x_ward_id"
+            data-table="beds"
+            data-field="x_ward_id"
+            data-caption="<?= HtmlEncode(RemoveHtml($Page->ward_id->caption())) ?>"
+            data-filter="true"
+            multiple
+            size="1"
+            data-value-separator="<?= $Page->ward_id->displayValueSeparatorAttribute() ?>"
+            data-placeholder="<?= HtmlEncode($Page->ward_id->getPlaceHolder()) ?>"
+            data-ew-action="update-options"
+            <?= $Page->ward_id->editAttributes() ?>>
+            <?= $Page->ward_id->selectOptionListHtml("x_ward_id", true) ?>
+        </select>
+        <div class="invalid-feedback"><?= $Page->ward_id->getErrorMessage(false) ?></div>
+        <script>
+        loadjs.ready("fbedssrch", function() {
+            var options = {
+                name: "x_ward_id",
+                selectId: "fbedssrch_x_ward_id",
+                ajax: { id: "x_ward_id", form: "fbedssrch", limit: ew.FILTER_PAGE_SIZE, data: { ajax: "filter" } }
+            };
+            options = Object.assign({}, ew.filterOptions, options, ew.vars.tables.beds.fields.ward_id.filterOptions);
+            ew.createFilter(options);
+        });
+        </script>
+    </div><!-- /.col-sm-auto -->
+<?php } ?>
+</div><!-- /.row -->
 <div class="row mb-0">
     <div class="col-sm-auto px-0 pe-sm-2">
         <div class="ew-basic-search input-group">
@@ -176,6 +345,12 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
+<?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <th data-name="floor_id" class="<?= $Page->floor_id->headerCellClass() ?>"><div id="elh_beds_floor_id" class="beds_floor_id"><?= $Page->renderFieldHeader($Page->floor_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
+        <th data-name="ward_type_id" class="<?= $Page->ward_type_id->headerCellClass() ?>"><div id="elh_beds_ward_type_id" class="beds_ward_type_id"><?= $Page->renderFieldHeader($Page->ward_type_id) ?></div></th>
+<?php } ?>
 <?php if ($Page->ward_id->Visible) { // ward_id ?>
         <th data-name="ward_id" class="<?= $Page->ward_id->headerCellClass() ?>"><div id="elh_beds_ward_id" class="beds_ward_id"><?= $Page->renderFieldHeader($Page->ward_id) ?></div></th>
 <?php } ?>
@@ -213,6 +388,22 @@ while ($Page->RecordCount < $Page->StopRecord || $Page->RowIndex === '$rowindex$
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
+    <?php if ($Page->floor_id->Visible) { // floor_id ?>
+        <td data-name="floor_id"<?= $Page->floor_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_beds_floor_id" class="el_beds_floor_id">
+<span<?= $Page->floor_id->viewAttributes() ?>>
+<?= $Page->floor_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->ward_type_id->Visible) { // ward_type_id ?>
+        <td data-name="ward_type_id"<?= $Page->ward_type_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_beds_ward_type_id" class="el_beds_ward_type_id">
+<span<?= $Page->ward_type_id->viewAttributes() ?>>
+<?= $Page->ward_type_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->ward_id->Visible) { // ward_id ?>
         <td data-name="ward_id"<?= $Page->ward_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_beds_ward_id" class="el_beds_ward_id">

@@ -33,6 +33,12 @@ class Bed extends AbstractEntity
     #[GeneratedValue]
     private int $id;
 
+    #[Column(name: "floor_id", type: "integer")]
+    private int $floorId;
+
+    #[Column(name: "ward_type_id", type: "integer")]
+    private int $wardTypeId;
+
     #[Column(name: "ward_id", type: "integer")]
     private int $wardId;
 
@@ -56,6 +62,28 @@ class Bed extends AbstractEntity
     public function setId(int $value): static
     {
         $this->id = $value;
+        return $this;
+    }
+
+    public function getFloorId(): int
+    {
+        return $this->floorId;
+    }
+
+    public function setFloorId(int $value): static
+    {
+        $this->floorId = $value;
+        return $this;
+    }
+
+    public function getWardTypeId(): int
+    {
+        return $this->wardTypeId;
+    }
+
+    public function setWardTypeId(int $value): static
+    {
+        $this->wardTypeId = $value;
         return $this;
     }
 

@@ -145,6 +145,8 @@ class BedsGrid extends Beds
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->floor_id->setVisibility();
+        $this->ward_type_id->setVisibility();
         $this->ward_id->setVisibility();
         $this->bed_name->setVisibility();
         $this->bed_charges->setVisibility();
@@ -631,6 +633,8 @@ class BedsGrid extends Beds
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->floor_id);
+        $this->setupLookupOptions($this->ward_type_id);
         $this->setupLookupOptions($this->ward_id);
 
         // Load default values for add
@@ -1168,6 +1172,22 @@ class BedsGrid extends Beds
     public function emptyRow()
     {
         global $CurrentForm;
+        if (
+            $CurrentForm->hasValue("x_floor_id") &&
+            $CurrentForm->hasValue("o_floor_id") &&
+            $this->floor_id->CurrentValue != $this->floor_id->DefaultValue &&
+            !($this->floor_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->floor_id->CurrentValue == $this->floor_id->getSessionValue())
+        ) {
+            return false;
+        }
+        if (
+            $CurrentForm->hasValue("x_ward_type_id") &&
+            $CurrentForm->hasValue("o_ward_type_id") &&
+            $this->ward_type_id->CurrentValue != $this->ward_type_id->DefaultValue &&
+            !($this->ward_type_id->IsForeignKey && $this->getCurrentMasterTable() != "" && $this->ward_type_id->CurrentValue == $this->ward_type_id->getSessionValue())
+        ) {
+            return false;
+        }
         if (
             $CurrentForm->hasValue("x_ward_id") &&
             $CurrentForm->hasValue("o_ward_id") &&
@@ -1723,6 +1743,32 @@ class BedsGrid extends Beds
         $CurrentForm->FormName = $this->FormName;
         $validate = !Config("SERVER_VALIDATE");
 
+        // Check field name 'floor_id' first before field var 'x_floor_id'
+        $val = $CurrentForm->hasValue("floor_id") ? $CurrentForm->getValue("floor_id") : $CurrentForm->getValue("x_floor_id");
+        if (!$this->floor_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->floor_id->Visible = false; // Disable update for API request
+            } else {
+                $this->floor_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_floor_id")) {
+            $this->floor_id->setOldValue($CurrentForm->getValue("o_floor_id"));
+        }
+
+        // Check field name 'ward_type_id' first before field var 'x_ward_type_id'
+        $val = $CurrentForm->hasValue("ward_type_id") ? $CurrentForm->getValue("ward_type_id") : $CurrentForm->getValue("x_ward_type_id");
+        if (!$this->ward_type_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->ward_type_id->Visible = false; // Disable update for API request
+            } else {
+                $this->ward_type_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_ward_type_id")) {
+            $this->ward_type_id->setOldValue($CurrentForm->getValue("o_ward_type_id"));
+        }
+
         // Check field name 'ward_id' first before field var 'x_ward_id'
         $val = $CurrentForm->hasValue("ward_id") ? $CurrentForm->getValue("ward_id") : $CurrentForm->getValue("x_ward_id");
         if (!$this->ward_id->IsDetailKey) {
@@ -1776,6 +1822,8 @@ class BedsGrid extends Beds
         if (!$this->isGridAdd() && !$this->isAdd()) {
             $this->id->CurrentValue = $this->id->FormValue;
         }
+        $this->floor_id->CurrentValue = $this->floor_id->FormValue;
+        $this->ward_type_id->CurrentValue = $this->ward_type_id->FormValue;
         $this->ward_id->CurrentValue = $this->ward_id->FormValue;
         $this->bed_name->CurrentValue = $this->bed_name->FormValue;
         $this->bed_charges->CurrentValue = $this->bed_charges->FormValue;
@@ -1875,6 +1923,8 @@ class BedsGrid extends Beds
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
+        $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_id->setDbValue($row['ward_id']);
         $this->bed_name->setDbValue($row['bed_name']);
         $this->bed_charges->setDbValue($row['bed_charges']);
@@ -1887,6 +1937,8 @@ class BedsGrid extends Beds
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['floor_id'] = $this->floor_id->DefaultValue;
+        $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
         $row['ward_id'] = $this->ward_id->DefaultValue;
         $row['bed_name'] = $this->bed_name->DefaultValue;
         $row['bed_charges'] = $this->bed_charges->DefaultValue;
@@ -1932,6 +1984,10 @@ class BedsGrid extends Beds
 
         // id
 
+        // floor_id
+
+        // ward_type_id
+
         // ward_id
 
         // bed_name
@@ -1946,6 +2002,52 @@ class BedsGrid extends Beds
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // floor_id
+            $curVal = strval($this->floor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+                if ($this->floor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                    } else {
+                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->floor_id->ViewValue = null;
+            }
+
+            // ward_type_id
+            $curVal = strval($this->ward_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
+                if ($this->ward_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->ward_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->ward_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->ward_type_id->ViewValue = $this->ward_type_id->displayValue($arwrk);
+                    } else {
+                        $this->ward_type_id->ViewValue = FormatNumber($this->ward_type_id->CurrentValue, $this->ward_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->ward_type_id->ViewValue = null;
+            }
 
             // ward_id
             $curVal = strval($this->ward_id->CurrentValue);
@@ -1985,6 +2087,14 @@ class BedsGrid extends Beds
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // floor_id
+            $this->floor_id->HrefValue = "";
+            $this->floor_id->TooltipValue = "";
+
+            // ward_type_id
+            $this->ward_type_id->HrefValue = "";
+            $this->ward_type_id->TooltipValue = "";
+
             // ward_id
             $this->ward_id->HrefValue = "";
             $this->ward_id->TooltipValue = "";
@@ -1997,6 +2107,60 @@ class BedsGrid extends Beds
             $this->bed_charges->HrefValue = "";
             $this->bed_charges->TooltipValue = "";
         } elseif ($this->RowType == RowType::ADD) {
+            // floor_id
+            $this->floor_id->setupEditAttributes();
+            $curVal = trim(strval($this->floor_id->CurrentValue));
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+            } else {
+                $this->floor_id->ViewValue = $this->floor_id->Lookup !== null && is_array($this->floor_id->lookupOptions()) && count($this->floor_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->floor_id->ViewValue !== null) { // Load from cache
+                $this->floor_id->EditValue = array_values($this->floor_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->floor_id->CurrentValue, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->floor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->floor_id->EditValue = $arwrk;
+            }
+            $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
+
+            // ward_type_id
+            $this->ward_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->ward_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->Lookup !== null && is_array($this->ward_type_id->lookupOptions()) && count($this->ward_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->ward_type_id->ViewValue !== null) { // Load from cache
+                $this->ward_type_id->EditValue = array_values($this->ward_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->ward_type_id->CurrentValue, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->ward_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->ward_type_id->EditValue = $arwrk;
+            }
+            $this->ward_type_id->PlaceHolder = RemoveHtml($this->ward_type_id->caption());
+
             // ward_id
             $this->ward_id->setupEditAttributes();
             if ($this->ward_id->getSessionValue() != "") {
@@ -2068,6 +2232,12 @@ class BedsGrid extends Beds
 
             // Add refer script
 
+            // floor_id
+            $this->floor_id->HrefValue = "";
+
+            // ward_type_id
+            $this->ward_type_id->HrefValue = "";
+
             // ward_id
             $this->ward_id->HrefValue = "";
 
@@ -2077,6 +2247,60 @@ class BedsGrid extends Beds
             // bed_charges
             $this->bed_charges->HrefValue = "";
         } elseif ($this->RowType == RowType::EDIT) {
+            // floor_id
+            $this->floor_id->setupEditAttributes();
+            $curVal = trim(strval($this->floor_id->CurrentValue));
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+            } else {
+                $this->floor_id->ViewValue = $this->floor_id->Lookup !== null && is_array($this->floor_id->lookupOptions()) && count($this->floor_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->floor_id->ViewValue !== null) { // Load from cache
+                $this->floor_id->EditValue = array_values($this->floor_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->floor_id->CurrentValue, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->floor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->floor_id->EditValue = $arwrk;
+            }
+            $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
+
+            // ward_type_id
+            $this->ward_type_id->setupEditAttributes();
+            $curVal = trim(strval($this->ward_type_id->CurrentValue));
+            if ($curVal != "") {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
+            } else {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->Lookup !== null && is_array($this->ward_type_id->lookupOptions()) && count($this->ward_type_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->ward_type_id->ViewValue !== null) { // Load from cache
+                $this->ward_type_id->EditValue = array_values($this->ward_type_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->ward_type_id->CurrentValue, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->ward_type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->ward_type_id->EditValue = $arwrk;
+            }
+            $this->ward_type_id->PlaceHolder = RemoveHtml($this->ward_type_id->caption());
+
             // ward_id
             $this->ward_id->setupEditAttributes();
             if ($this->ward_id->getSessionValue() != "") {
@@ -2148,6 +2372,12 @@ class BedsGrid extends Beds
 
             // Edit refer script
 
+            // floor_id
+            $this->floor_id->HrefValue = "";
+
+            // ward_type_id
+            $this->ward_type_id->HrefValue = "";
+
             // ward_id
             $this->ward_id->HrefValue = "";
 
@@ -2177,6 +2407,16 @@ class BedsGrid extends Beds
             return true;
         }
         $validateForm = true;
+            if ($this->floor_id->Visible && $this->floor_id->Required) {
+                if (!$this->floor_id->IsDetailKey && EmptyValue($this->floor_id->FormValue)) {
+                    $this->floor_id->addErrorMessage(str_replace("%s", $this->floor_id->caption(), $this->floor_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->ward_type_id->Visible && $this->ward_type_id->Required) {
+                if (!$this->ward_type_id->IsDetailKey && EmptyValue($this->ward_type_id->FormValue)) {
+                    $this->ward_type_id->addErrorMessage(str_replace("%s", $this->ward_type_id->caption(), $this->ward_type_id->RequiredErrorMessage));
+                }
+            }
             if ($this->ward_id->Visible && $this->ward_id->Required) {
                 if (!$this->ward_id->IsDetailKey && EmptyValue($this->ward_id->FormValue)) {
                     $this->ward_id->addErrorMessage(str_replace("%s", $this->ward_id->caption(), $this->ward_id->RequiredErrorMessage));
@@ -2348,6 +2588,12 @@ class BedsGrid extends Beds
         global $Security;
         $rsnew = [];
 
+        // floor_id
+        $this->floor_id->setDbValueDef($rsnew, $this->floor_id->CurrentValue, $this->floor_id->ReadOnly);
+
+        // ward_type_id
+        $this->ward_type_id->setDbValueDef($rsnew, $this->ward_type_id->CurrentValue, $this->ward_type_id->ReadOnly);
+
         // ward_id
         if ($this->ward_id->getSessionValue() != "") {
             $this->ward_id->ReadOnly = true;
@@ -2368,6 +2614,12 @@ class BedsGrid extends Beds
      */
     protected function restoreEditFormFromRow($row)
     {
+        if (isset($row['floor_id'])) { // floor_id
+            $this->floor_id->CurrentValue = $row['floor_id'];
+        }
+        if (isset($row['ward_type_id'])) { // ward_type_id
+            $this->ward_type_id->CurrentValue = $row['ward_type_id'];
+        }
         if (isset($row['ward_id'])) { // ward_id
             $this->ward_id->CurrentValue = $row['ward_id'];
         }
@@ -2436,6 +2688,12 @@ class BedsGrid extends Beds
         global $Security;
         $rsnew = [];
 
+        // floor_id
+        $this->floor_id->setDbValueDef($rsnew, $this->floor_id->CurrentValue, false);
+
+        // ward_type_id
+        $this->ward_type_id->setDbValueDef($rsnew, $this->ward_type_id->CurrentValue, false);
+
         // ward_id
         $this->ward_id->setDbValueDef($rsnew, $this->ward_id->CurrentValue, false);
 
@@ -2453,6 +2711,12 @@ class BedsGrid extends Beds
      */
     protected function restoreAddFormFromRow($row)
     {
+        if (isset($row['floor_id'])) { // floor_id
+            $this->floor_id->setFormValue($row['floor_id']);
+        }
+        if (isset($row['ward_type_id'])) { // ward_type_id
+            $this->ward_type_id->setFormValue($row['ward_type_id']);
+        }
         if (isset($row['ward_id'])) { // ward_id
             $this->ward_id->setFormValue($row['ward_id']);
         }
@@ -2493,6 +2757,10 @@ class BedsGrid extends Beds
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_floor_id":
+                    break;
+                case "x_ward_type_id":
+                    break;
                 case "x_ward_id":
                     break;
                 default:

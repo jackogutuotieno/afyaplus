@@ -155,6 +155,8 @@ class BedsList extends Beds
     public function setVisibility()
     {
         $this->id->Visible = false;
+        $this->floor_id->setVisibility();
+        $this->ward_type_id->setVisibility();
         $this->ward_id->setVisibility();
         $this->bed_name->setVisibility();
         $this->bed_charges->setVisibility();
@@ -719,6 +721,8 @@ class BedsList extends Beds
         $this->setupOtherOptions();
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->floor_id);
+        $this->setupLookupOptions($this->ward_type_id);
         $this->setupLookupOptions($this->ward_id);
 
         // Update form name to avoid conflict
@@ -787,14 +791,23 @@ class BedsList extends Beds
 
         // Get default search criteria
         AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+        AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
         // Get basic search values
         $this->loadBasicSearchValues();
+
+        // Get and validate search values for advanced search
+        if (EmptyValue($this->UserAction)) { // Skip if user action
+            $this->loadSearchValues();
+        }
 
         // Process filter list
         if ($this->processFilterList()) {
             $this->terminate();
             return;
+        }
+        if (!$this->validateSearch()) {
+            // Nothing to do
         }
 
         // Restore search parms from Session if not searching / reset / export
@@ -813,6 +826,14 @@ class BedsList extends Beds
             $srchBasic = $this->basicSearchWhere();
         }
 
+        // Get advanced search criteria
+        if (!$this->hasInvalidFields()) {
+            $srchAdvanced = $this->advancedSearchWhere();
+        }
+
+        // Get query builder criteria
+        $query = $DashboardReport ? "" : $this->queryBuilderWhere();
+
         // Restore display records
         if ($this->Command != "json" && $this->getRecordsPerPage() != "") {
             $this->DisplayRecords = $this->getRecordsPerPage(); // Restore from Session
@@ -828,6 +849,16 @@ class BedsList extends Beds
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere(); // Save to session
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere(); // Save to session
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -1090,6 +1121,8 @@ class BedsList extends Beds
             $savedFilterList = Profile()->getSearchFilters("fbedssrch");
         }
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->floor_id->AdvancedSearch->toJson(), ","); // Field floor_id
+        $filterList = Concat($filterList, $this->ward_type_id->AdvancedSearch->toJson(), ","); // Field ward_type_id
         $filterList = Concat($filterList, $this->ward_id->AdvancedSearch->toJson(), ","); // Field ward_id
         $filterList = Concat($filterList, $this->bed_name->AdvancedSearch->toJson(), ","); // Field bed_name
         $filterList = Concat($filterList, $this->bed_charges->AdvancedSearch->toJson(), ","); // Field bed_charges
@@ -1142,6 +1175,22 @@ class BedsList extends Beds
         $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
         $this->id->AdvancedSearch->save();
 
+        // Field floor_id
+        $this->floor_id->AdvancedSearch->SearchValue = @$filter["x_floor_id"];
+        $this->floor_id->AdvancedSearch->SearchOperator = @$filter["z_floor_id"];
+        $this->floor_id->AdvancedSearch->SearchCondition = @$filter["v_floor_id"];
+        $this->floor_id->AdvancedSearch->SearchValue2 = @$filter["y_floor_id"];
+        $this->floor_id->AdvancedSearch->SearchOperator2 = @$filter["w_floor_id"];
+        $this->floor_id->AdvancedSearch->save();
+
+        // Field ward_type_id
+        $this->ward_type_id->AdvancedSearch->SearchValue = @$filter["x_ward_type_id"];
+        $this->ward_type_id->AdvancedSearch->SearchOperator = @$filter["z_ward_type_id"];
+        $this->ward_type_id->AdvancedSearch->SearchCondition = @$filter["v_ward_type_id"];
+        $this->ward_type_id->AdvancedSearch->SearchValue2 = @$filter["y_ward_type_id"];
+        $this->ward_type_id->AdvancedSearch->SearchOperator2 = @$filter["w_ward_type_id"];
+        $this->ward_type_id->AdvancedSearch->save();
+
         // Field ward_id
         $this->ward_id->AdvancedSearch->SearchValue = @$filter["x_ward_id"];
         $this->ward_id->AdvancedSearch->SearchOperator = @$filter["z_ward_id"];
@@ -1185,6 +1234,120 @@ class BedsList extends Beds
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
+    // Advanced search WHERE clause based on QueryString
+    public function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->floor_id, $default, true); // floor_id
+        $this->buildSearchSql($where, $this->ward_type_id, $default, true); // ward_type_id
+        $this->buildSearchSql($where, $this->ward_id, $default, true); // ward_id
+        $this->buildSearchSql($where, $this->bed_name, $default, false); // bed_name
+        $this->buildSearchSql($where, $this->bed_charges, $default, false); // bed_charges
+        $this->buildSearchSql($where, $this->date_created, $default, false); // date_created
+        $this->buildSearchSql($where, $this->date_updated, $default, false); // date_updated
+
+        // Set up search command
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->floor_id->AdvancedSearch->save(); // floor_id
+            $this->ward_type_id->AdvancedSearch->save(); // ward_type_id
+            $this->ward_id->AdvancedSearch->save(); // ward_id
+            $this->bed_name->AdvancedSearch->save(); // bed_name
+            $this->bed_charges->AdvancedSearch->save(); // bed_charges
+            $this->date_created->AdvancedSearch->save(); // date_created
+            $this->date_updated->AdvancedSearch->save(); // date_updated
+
+            // Clear rules for QueryBuilder
+            $this->setSessionRules("");
+        }
+        return $where;
+    }
+
+    // Query builder rules
+    public function queryBuilderRules()
+    {
+        return Post("rules") ?? $this->getSessionRules();
+    }
+
+    // Quey builder WHERE clause
+    public function queryBuilderWhere($fieldName = "")
+    {
+        global $Security;
+        if (!$Security->canSearch()) {
+            return "";
+        }
+
+        // Get rules by query builder
+        $rules = $this->queryBuilderRules();
+
+        // Decode and parse rules
+        $where = $rules ? $this->parseRules(json_decode($rules, true), $fieldName) : "";
+
+        // Clear other search and save rules to session
+        if ($where && $fieldName == "") { // Skip if get query for specific field
+            $this->resetSearchParms();
+            $this->id->AdvancedSearch->save(); // id
+            $this->floor_id->AdvancedSearch->save(); // floor_id
+            $this->ward_type_id->AdvancedSearch->save(); // ward_type_id
+            $this->ward_id->AdvancedSearch->save(); // ward_id
+            $this->bed_name->AdvancedSearch->save(); // bed_name
+            $this->bed_charges->AdvancedSearch->save(); // bed_charges
+            $this->date_created->AdvancedSearch->save(); // date_created
+            $this->date_updated->AdvancedSearch->save(); // date_updated
+            $this->setSessionRules($rules);
+        }
+
+        // Return query
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, $fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = $default ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = $default ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = $default ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = $default ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = $default ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $fldVal = ConvertSearchValue($fldVal, $fldOpr, $fld);
+        $fldVal2 = ConvertSearchValue($fldVal2, $fldOpr2, $fld);
+        $fldOpr = ConvertSearchOperator($fldOpr, $fld, $fldVal);
+        $fldOpr2 = ConvertSearchOperator($fldOpr2, $fld, $fldVal2);
+        $wrk = "";
+        $sep = $fld->UseFilter ? Config("FILTER_OPTION_SEPARATOR") : Config("MULTIPLE_OPTION_SEPARATOR");
+        if (is_array($fldVal)) {
+            $fldVal = implode($sep, $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode($sep, $fldVal2);
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 && !$fld->UseFilter || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk = $fldVal != "" ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = $fldVal2 != "" ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            AddFilter($wrk, $wrk2, $fldCond);
+        } else {
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        if ($this->SearchOption == "AUTO" && in_array($this->BasicSearch->getType(), ["AND", "OR"])) {
+            $cond = $this->BasicSearch->getType();
+        } else {
+            $cond = SameText($this->SearchOption, "OR") ? "OR" : "AND";
+        }
+        AddFilter($where, $wrk, $cond);
+    }
+
     // Show list of filters
     public function showFilterList()
     {
@@ -1194,6 +1357,51 @@ class BedsList extends Beds
         $filterList = "";
         $captionClass = $this->isExport("email") ? "ew-filter-caption-email" : "ew-filter-caption";
         $captionSuffix = $this->isExport("email") ? ": " : "";
+
+        // Field floor_id
+        $filter = $this->queryBuilderWhere("floor_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->floor_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->floor_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field ward_type_id
+        $filter = $this->queryBuilderWhere("ward_type_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->ward_type_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->ward_type_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field ward_id
+        $filter = $this->queryBuilderWhere("ward_id");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->ward_id, false, true);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->ward_id->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field bed_name
+        $filter = $this->queryBuilderWhere("bed_name");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->bed_name, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->bed_name->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
+
+        // Field bed_charges
+        $filter = $this->queryBuilderWhere("bed_charges");
+        if (!$filter) {
+            $this->buildSearchSql($filter, $this->bed_charges, false, false);
+        }
+        if ($filter != "") {
+            $filterList .= "<div><span class=\"" . $captionClass . "\">" . $this->bed_charges->caption() . "</span>" . $captionSuffix . $filter . "</div>";
+        }
         if ($this->BasicSearch->Keyword != "") {
             $filterList .= "<div><span class=\"" . $captionClass . "\">" . $Language->phrase("BasicSearchKeyword") . "</span>" . $captionSuffix . $this->BasicSearch->Keyword . "</div>";
         }
@@ -1249,6 +1457,30 @@ class BedsList extends Beds
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->floor_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->ward_type_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->ward_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->bed_name->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->bed_charges->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->date_created->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->date_updated->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1261,6 +1493,12 @@ class BedsList extends Beds
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+
+        // Clear queryBuilder
+        $this->setSessionRules("");
     }
 
     // Load advanced search default values
@@ -1275,6 +1513,19 @@ class BedsList extends Beds
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+        $this->id->AdvancedSearch->unsetSession();
+        $this->floor_id->AdvancedSearch->unsetSession();
+        $this->ward_type_id->AdvancedSearch->unsetSession();
+        $this->ward_id->AdvancedSearch->unsetSession();
+        $this->bed_name->AdvancedSearch->unsetSession();
+        $this->bed_charges->AdvancedSearch->unsetSession();
+        $this->date_created->AdvancedSearch->unsetSession();
+        $this->date_updated->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1282,6 +1533,16 @@ class BedsList extends Beds
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+        $this->id->AdvancedSearch->load();
+        $this->floor_id->AdvancedSearch->load();
+        $this->ward_type_id->AdvancedSearch->load();
+        $this->ward_id->AdvancedSearch->load();
+        $this->bed_name->AdvancedSearch->load();
+        $this->bed_charges->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
+        $this->date_updated->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1299,6 +1560,8 @@ class BedsList extends Beds
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
+            $this->updateSort($this->floor_id); // floor_id
+            $this->updateSort($this->ward_type_id); // ward_type_id
             $this->updateSort($this->ward_id); // ward_id
             $this->updateSort($this->bed_name); // bed_name
             $this->updateSort($this->bed_charges); // bed_charges
@@ -1335,6 +1598,8 @@ class BedsList extends Beds
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
+                $this->floor_id->setSort("");
+                $this->ward_type_id->setSort("");
                 $this->ward_id->setSort("");
                 $this->bed_name->setSort("");
                 $this->bed_charges->setSort("");
@@ -1548,6 +1813,8 @@ class BedsList extends Beds
             $item = &$option->addGroupOption();
             $item->Body = "";
             $item->Visible = $this->UseColumnVisibility;
+            $this->createColumnOption($option, "floor_id");
+            $this->createColumnOption($option, "ward_type_id");
             $this->createColumnOption($option, "ward_id");
             $this->createColumnOption($option, "bed_name");
             $this->createColumnOption($option, "bed_charges");
@@ -1896,6 +2163,85 @@ class BedsList extends Beds
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // Load query builder rules
+        $rules = Post("rules");
+        if ($rules && $this->Command == "") {
+            $this->QueryRules = $rules;
+            $this->Command = "search";
+        }
+
+        // id
+        if ($this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // floor_id
+        if ($this->floor_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->floor_id->AdvancedSearch->SearchValue != "" || $this->floor_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // ward_type_id
+        if ($this->ward_type_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->ward_type_id->AdvancedSearch->SearchValue != "" || $this->ward_type_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // ward_id
+        if ($this->ward_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->ward_id->AdvancedSearch->SearchValue != "" || $this->ward_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // bed_name
+        if ($this->bed_name->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->bed_name->AdvancedSearch->SearchValue != "" || $this->bed_name->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // bed_charges
+        if ($this->bed_charges->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->bed_charges->AdvancedSearch->SearchValue != "" || $this->bed_charges->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // date_created
+        if ($this->date_created->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->date_created->AdvancedSearch->SearchValue != "" || $this->date_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // date_updated
+        if ($this->date_updated->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->date_updated->AdvancedSearch->SearchValue != "" || $this->date_updated->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
     /**
      * Load result set
      *
@@ -1990,6 +2336,8 @@ class BedsList extends Beds
         // Call Row Selected event
         $this->rowSelected($row);
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
+        $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_id->setDbValue($row['ward_id']);
         $this->bed_name->setDbValue($row['bed_name']);
         $this->bed_charges->setDbValue($row['bed_charges']);
@@ -2002,6 +2350,8 @@ class BedsList extends Beds
     {
         $row = [];
         $row['id'] = $this->id->DefaultValue;
+        $row['floor_id'] = $this->floor_id->DefaultValue;
+        $row['ward_type_id'] = $this->ward_type_id->DefaultValue;
         $row['ward_id'] = $this->ward_id->DefaultValue;
         $row['bed_name'] = $this->bed_name->DefaultValue;
         $row['bed_charges'] = $this->bed_charges->DefaultValue;
@@ -2049,6 +2399,10 @@ class BedsList extends Beds
 
         // id
 
+        // floor_id
+
+        // ward_type_id
+
         // ward_id
 
         // bed_name
@@ -2063,6 +2417,52 @@ class BedsList extends Beds
         if ($this->RowType == RowType::VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
+
+            // floor_id
+            $curVal = strval($this->floor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+                if ($this->floor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                    } else {
+                        $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->floor_id->ViewValue = null;
+            }
+
+            // ward_type_id
+            $curVal = strval($this->ward_type_id->CurrentValue);
+            if ($curVal != "") {
+                $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
+                if ($this->ward_type_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->ward_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->ward_type_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->ward_type_id->ViewValue = $this->ward_type_id->displayValue($arwrk);
+                    } else {
+                        $this->ward_type_id->ViewValue = FormatNumber($this->ward_type_id->CurrentValue, $this->ward_type_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->ward_type_id->ViewValue = null;
+            }
 
             // ward_id
             $curVal = strval($this->ward_id->CurrentValue);
@@ -2102,6 +2502,14 @@ class BedsList extends Beds
             $this->date_updated->ViewValue = $this->date_updated->CurrentValue;
             $this->date_updated->ViewValue = FormatDateTime($this->date_updated->ViewValue, $this->date_updated->formatPattern());
 
+            // floor_id
+            $this->floor_id->HrefValue = "";
+            $this->floor_id->TooltipValue = "";
+
+            // ward_type_id
+            $this->ward_type_id->HrefValue = "";
+            $this->ward_type_id->TooltipValue = "";
+
             // ward_id
             $this->ward_id->HrefValue = "";
             $this->ward_id->TooltipValue = "";
@@ -2113,12 +2521,82 @@ class BedsList extends Beds
             // bed_charges
             $this->bed_charges->HrefValue = "";
             $this->bed_charges->TooltipValue = "";
+        } elseif ($this->RowType == RowType::SEARCH) {
+            // floor_id
+            if ($this->floor_id->UseFilter && !EmptyValue($this->floor_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->floor_id->AdvancedSearch->SearchValue)) {
+                    $this->floor_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->floor_id->AdvancedSearch->SearchValue);
+                }
+                $this->floor_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->floor_id->AdvancedSearch->SearchValue);
+            }
+
+            // ward_type_id
+            if ($this->ward_type_id->UseFilter && !EmptyValue($this->ward_type_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->ward_type_id->AdvancedSearch->SearchValue)) {
+                    $this->ward_type_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->ward_type_id->AdvancedSearch->SearchValue);
+                }
+                $this->ward_type_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->ward_type_id->AdvancedSearch->SearchValue);
+            }
+
+            // ward_id
+            if ($this->ward_id->UseFilter && !EmptyValue($this->ward_id->AdvancedSearch->SearchValue)) {
+                if (is_array($this->ward_id->AdvancedSearch->SearchValue)) {
+                    $this->ward_id->AdvancedSearch->SearchValue = implode(Config("FILTER_OPTION_SEPARATOR"), $this->ward_id->AdvancedSearch->SearchValue);
+                }
+                $this->ward_id->EditValue = explode(Config("FILTER_OPTION_SEPARATOR"), $this->ward_id->AdvancedSearch->SearchValue);
+            }
+
+            // bed_name
+            $this->bed_name->setupEditAttributes();
+            if (!$this->bed_name->Raw) {
+                $this->bed_name->AdvancedSearch->SearchValue = HtmlDecode($this->bed_name->AdvancedSearch->SearchValue);
+            }
+            $this->bed_name->EditValue = HtmlEncode($this->bed_name->AdvancedSearch->SearchValue);
+            $this->bed_name->PlaceHolder = RemoveHtml($this->bed_name->caption());
+
+            // bed_charges
+            $this->bed_charges->setupEditAttributes();
+            $this->bed_charges->EditValue = $this->bed_charges->AdvancedSearch->SearchValue;
+            $this->bed_charges->PlaceHolder = RemoveHtml($this->bed_charges->caption());
         }
 
         // Call Row Rendered event
         if ($this->RowType != RowType::AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->floor_id->AdvancedSearch->load();
+        $this->ward_type_id->AdvancedSearch->load();
+        $this->ward_id->AdvancedSearch->load();
+        $this->bed_name->AdvancedSearch->load();
+        $this->bed_charges->AdvancedSearch->load();
+        $this->date_created->AdvancedSearch->load();
+        $this->date_updated->AdvancedSearch->load();
     }
 
     // Get export HTML tag
@@ -2465,6 +2943,10 @@ class BedsList extends Beds
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_floor_id":
+                    break;
+                case "x_ward_type_id":
+                    break;
                 case "x_ward_id":
                     break;
                 default:

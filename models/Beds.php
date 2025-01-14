@@ -56,6 +56,8 @@ class Beds extends DbTable
 
     // Fields
     public $id;
+    public $floor_id;
+    public $ward_type_id;
     public $ward_id;
     public $bed_name;
     public $bed_charges;
@@ -134,6 +136,68 @@ class Beds extends DbTable
         $this->id->SearchOperators = ["=", "<>", "IN", "NOT IN", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['id'] = &$this->id;
 
+        // floor_id
+        $this->floor_id = new DbField(
+            $this, // Table
+            'x_floor_id', // Variable name
+            'floor_id', // Name
+            '`floor_id`', // Expression
+            '`floor_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`floor_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->floor_id->InputTextType = "text";
+        $this->floor_id->Raw = true;
+        $this->floor_id->Nullable = false; // NOT NULL field
+        $this->floor_id->Required = true; // Required field
+        $this->floor_id->setSelectMultiple(false); // Select one
+        $this->floor_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->floor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->floor_id->UseFilter = true; // Table header filter
+        $this->floor_id->Lookup = new Lookup($this->floor_id, 'floors', true, 'id', ["floor_name","","",""], '', '', [], ["x_ward_type_id"], [], [], [], [], false, '', '', "`floor_name`");
+        $this->floor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->floor_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['floor_id'] = &$this->floor_id;
+
+        // ward_type_id
+        $this->ward_type_id = new DbField(
+            $this, // Table
+            'x_ward_type_id', // Variable name
+            'ward_type_id', // Name
+            '`ward_type_id`', // Expression
+            '`ward_type_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`ward_type_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->ward_type_id->InputTextType = "text";
+        $this->ward_type_id->Raw = true;
+        $this->ward_type_id->Nullable = false; // NOT NULL field
+        $this->ward_type_id->Required = true; // Required field
+        $this->ward_type_id->setSelectMultiple(false); // Select one
+        $this->ward_type_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->ward_type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->ward_type_id->UseFilter = true; // Table header filter
+        $this->ward_type_id->Lookup = new Lookup($this->ward_type_id, 'ward_type', true, 'id', ["ward_type","","",""], '', '', ["x_floor_id"], [], ["floor_id"], ["x_floor_id"], [], [], false, '', '', "`ward_type`");
+        $this->ward_type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->ward_type_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['ward_type_id'] = &$this->ward_type_id;
+
         // ward_id
         $this->ward_id = new DbField(
             $this, // Table
@@ -160,7 +224,8 @@ class Beds extends DbTable
         $this->ward_id->setSelectMultiple(false); // Select one
         $this->ward_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->ward_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->ward_id->Lookup = new Lookup($this->ward_id, 'wards', false, 'id', ["ward_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`ward_name`");
+        $this->ward_id->UseFilter = true; // Table header filter
+        $this->ward_id->Lookup = new Lookup($this->ward_id, 'wards', true, 'id', ["ward_name","","",""], '', '', [], [], [], [], [], [], false, '', '', "`ward_name`");
         $this->ward_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->ward_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
         $this->Fields['ward_id'] = &$this->ward_id;
@@ -883,6 +948,8 @@ class Beds extends DbTable
             return;
         }
         $this->id->DbValue = $row['id'];
+        $this->floor_id->DbValue = $row['floor_id'];
+        $this->ward_type_id->DbValue = $row['ward_type_id'];
         $this->ward_id->DbValue = $row['ward_id'];
         $this->bed_name->DbValue = $row['bed_name'];
         $this->bed_charges->DbValue = $row['bed_charges'];
@@ -1245,6 +1312,8 @@ class Beds extends DbTable
             return;
         }
         $this->id->setDbValue($row['id']);
+        $this->floor_id->setDbValue($row['floor_id']);
+        $this->ward_type_id->setDbValue($row['ward_type_id']);
         $this->ward_id->setDbValue($row['ward_id']);
         $this->bed_name->setDbValue($row['bed_name']);
         $this->bed_charges->setDbValue($row['bed_charges']);
@@ -1282,6 +1351,10 @@ class Beds extends DbTable
 
         // id
 
+        // floor_id
+
+        // ward_type_id
+
         // ward_id
 
         // bed_name
@@ -1294,6 +1367,52 @@ class Beds extends DbTable
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
+
+        // floor_id
+        $curVal = strval($this->floor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->floor_id->ViewValue = $this->floor_id->lookupCacheOption($curVal);
+            if ($this->floor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->floor_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->floor_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->floor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->floor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->floor_id->ViewValue = $this->floor_id->displayValue($arwrk);
+                } else {
+                    $this->floor_id->ViewValue = FormatNumber($this->floor_id->CurrentValue, $this->floor_id->formatPattern());
+                }
+            }
+        } else {
+            $this->floor_id->ViewValue = null;
+        }
+
+        // ward_type_id
+        $curVal = strval($this->ward_type_id->CurrentValue);
+        if ($curVal != "") {
+            $this->ward_type_id->ViewValue = $this->ward_type_id->lookupCacheOption($curVal);
+            if ($this->ward_type_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->ward_type_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->ward_type_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->ward_type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->ward_type_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->ward_type_id->ViewValue = $this->ward_type_id->displayValue($arwrk);
+                } else {
+                    $this->ward_type_id->ViewValue = FormatNumber($this->ward_type_id->CurrentValue, $this->ward_type_id->formatPattern());
+                }
+            }
+        } else {
+            $this->ward_type_id->ViewValue = null;
+        }
 
         // ward_id
         $curVal = strval($this->ward_id->CurrentValue);
@@ -1337,6 +1456,14 @@ class Beds extends DbTable
         $this->id->HrefValue = "";
         $this->id->TooltipValue = "";
 
+        // floor_id
+        $this->floor_id->HrefValue = "";
+        $this->floor_id->TooltipValue = "";
+
+        // ward_type_id
+        $this->ward_type_id->HrefValue = "";
+        $this->ward_type_id->TooltipValue = "";
+
         // ward_id
         $this->ward_id->HrefValue = "";
         $this->ward_id->TooltipValue = "";
@@ -1375,6 +1502,14 @@ class Beds extends DbTable
         // id
         $this->id->setupEditAttributes();
         $this->id->EditValue = $this->id->CurrentValue;
+
+        // floor_id
+        $this->floor_id->setupEditAttributes();
+        $this->floor_id->PlaceHolder = RemoveHtml($this->floor_id->caption());
+
+        // ward_type_id
+        $this->ward_type_id->setupEditAttributes();
+        $this->ward_type_id->PlaceHolder = RemoveHtml($this->ward_type_id->caption());
 
         // ward_id
         $this->ward_id->setupEditAttributes();
@@ -1460,6 +1595,8 @@ class Beds extends DbTable
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->floor_id);
+                    $doc->exportCaption($this->ward_type_id);
                     $doc->exportCaption($this->ward_id);
                     $doc->exportCaption($this->bed_name);
                     $doc->exportCaption($this->bed_charges);
@@ -1467,6 +1604,8 @@ class Beds extends DbTable
                     $doc->exportCaption($this->date_updated);
                 } else {
                     $doc->exportCaption($this->id);
+                    $doc->exportCaption($this->floor_id);
+                    $doc->exportCaption($this->ward_type_id);
                     $doc->exportCaption($this->ward_id);
                     $doc->exportCaption($this->bed_name);
                     $doc->exportCaption($this->bed_charges);
@@ -1499,6 +1638,8 @@ class Beds extends DbTable
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->floor_id);
+                        $doc->exportField($this->ward_type_id);
                         $doc->exportField($this->ward_id);
                         $doc->exportField($this->bed_name);
                         $doc->exportField($this->bed_charges);
@@ -1506,6 +1647,8 @@ class Beds extends DbTable
                         $doc->exportField($this->date_updated);
                     } else {
                         $doc->exportField($this->id);
+                        $doc->exportField($this->floor_id);
+                        $doc->exportField($this->ward_type_id);
                         $doc->exportField($this->ward_id);
                         $doc->exportField($this->bed_name);
                         $doc->exportField($this->bed_charges);
