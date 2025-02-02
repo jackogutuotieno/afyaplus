@@ -187,6 +187,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->email_address->Visible) { // email_address ?>
         <th data-name="email_address" class="<?= $Page->email_address->headerCellClass() ?>"><div id="elh_patients_email_address" class="patients_email_address"><?= $Page->renderFieldHeader($Page->email_address) ?></div></th>
 <?php } ?>
+<?php if ($Page->county_id->Visible) { // county_id ?>
+        <th data-name="county_id" class="<?= $Page->county_id->headerCellClass() ?>"><div id="elh_patients_county_id" class="patients_county_id"><?= $Page->renderFieldHeader($Page->county_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->subcounty_id->Visible) { // subcounty_id ?>
+        <th data-name="subcounty_id" class="<?= $Page->subcounty_id->headerCellClass() ?>"><div id="elh_patients_subcounty_id" class="patients_subcounty_id"><?= $Page->renderFieldHeader($Page->subcounty_id) ?></div></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th data-name="date_created" class="<?= $Page->date_created->headerCellClass() ?>"><div id="elh_patients_date_created" class="patients_date_created"><?= $Page->renderFieldHeader($Page->date_created) ?></div></th>
 <?php } ?>
@@ -289,6 +295,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <?= $Page->email_address->getViewValue() ?>
 <?php } ?>
 </span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->county_id->Visible) { // county_id ?>
+        <td data-name="county_id"<?= $Page->county_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_county_id" class="el_patients_county_id">
+<span<?= $Page->county_id->viewAttributes() ?>>
+<?= $Page->county_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->subcounty_id->Visible) { // subcounty_id ?>
+        <td data-name="subcounty_id"<?= $Page->subcounty_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_patients_subcounty_id" class="el_patients_subcounty_id">
+<span<?= $Page->subcounty_id->viewAttributes() ?>>
+<?= $Page->subcounty_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

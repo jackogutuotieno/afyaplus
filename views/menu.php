@@ -22,11 +22,14 @@ $sideMenu->addMenuItem(1030, "mi_Procurement_Overview", $Language->menuPhrase("1
 $sideMenu->addMenuItem(103, "mci_Administrator", $Language->menuPhrase("103", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(37, "mi_users", $Language->menuPhrase("37", "MenuText"), "userslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}users'), false, false, "fa-users", "", false, true);
 $sideMenu->addMenuItem(747, "mi_modules", $Language->menuPhrase("747", "MenuText"), "moduleslist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}modules'), false, false, "fa-cog", "", false, true);
+$sideMenu->addMenuItem(1177, "mi_county", $Language->menuPhrase("1177", "MenuText"), "countylist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}county'), false, false, "fa-location-pin", "", false, true);
+$sideMenu->addMenuItem(1178, "mi_sub_county", $Language->menuPhrase("1178", "MenuText"), "subcountylist", 103, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}sub_county'), false, false, "fa-location-pin", "", false, true);
 $sideMenu->addMenuItem(855, "mci_Operations", $Language->menuPhrase("855", "MenuText"), "", -1, "", true, false, true, "fa-cog", "", false, true);
 $sideMenu->addMenuItem(754, "mi_floors", $Language->menuPhrase("754", "MenuText"), "floorslist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}floors'), false, false, "fa-building", "", false, true);
 $sideMenu->addMenuItem(755, "mi_ward_type", $Language->menuPhrase("755", "MenuText"), "wardtypelist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}ward_type'), false, false, "fa-building", "", false, true);
 $sideMenu->addMenuItem(756, "mi_wards", $Language->menuPhrase("756", "MenuText"), "wardslist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}wards'), false, false, "fa-building", "", false, true);
 $sideMenu->addMenuItem(753, "mi_beds", $Language->menuPhrase("753", "MenuText"), "bedslist?cmd=resetall", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}beds'), false, false, "fa-bed", "", false, true);
+$sideMenu->addMenuItem(1176, "mi_beds_status", $Language->menuPhrase("1176", "MenuText"), "bedsstatuslist", 855, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}beds_status'), false, false, "fa-bed", "", false, true);
 $sideMenu->addMenuItem(108, "mi_subscriptions", $Language->menuPhrase("108", "MenuText"), "subscriptionslist", -1, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}subscriptions'), false, false, "fa-bell", "", false, true);
 $sideMenu->addMenuItem(51, "mci_OPD_Services", $Language->menuPhrase("51", "MenuText"), "", -1, "", true, false, true, "fa-hospital-user", "", false, true);
 $sideMenu->addMenuItem(48, "mi_patients", $Language->menuPhrase("48", "MenuText"), "patientslist", 51, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}patients'), false, false, "fa-hospital-user", "", false, true);
@@ -112,6 +115,6 @@ $sideMenu->addMenuItem(324, "mi_Expenses_Report", $Language->menuPhrase("324", "
 $sideMenu->addMenuItem(1029, "mi_Procurement_Report", $Language->menuPhrase("1029", "MenuText"), "procurementreport", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}Procurement Report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(1028, "mi_procurement_report2", $Language->menuPhrase("1028", "MenuText"), "procurementreport2list", 312, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}procurement_report'), false, false, "fa-file", "", false, true);
 $sideMenu->addMenuItem(427, "mci_External_Reports", $Language->menuPhrase("427", "MenuText"), "", 104, "", true, false, true, "fa-file", "", false, true);
-$sideMenu->addMenuItem(335, "mi_moh204a_report", $Language->menuPhrase("335", "MenuText"), "moh204areportlist", 427, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}moh204a_report'), false, false, "fa-file", "", false, true);
-$sideMenu->addMenuItem(428, "mi_moh204b_report", $Language->menuPhrase("428", "MenuText"), "moh204breportlist", 427, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}moh204b_report'), false, false, "fa-file", "", false, true);
+$sideMenu->addMenuItem(1179, "mi_moh704a_report", $Language->menuPhrase("1179", "MenuText"), "moh704areportlist", 427, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}moh704a_report'), false, false, "fa-file", "", false, true);
+$sideMenu->addMenuItem(1180, "mi_moh704b_report", $Language->menuPhrase("1180", "MenuText"), "moh704breportlist", 427, "", AllowListMenu('{32536B8D-F37B-4419-80D5-260932800712}moh704b_report'), false, false, "fa-file", "", false, true);
 echo $sideMenu->toScript();

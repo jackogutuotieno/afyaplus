@@ -45,7 +45,7 @@ class PersonalData
     public $RenderingView = false;
 
     // CSS class/style
-    public $CurrentPageName = "ipdtotalbedchargesgrid";
+    public $CurrentPageName = "moh704breportlist";
 
     // Page headings
     public $Heading = "";

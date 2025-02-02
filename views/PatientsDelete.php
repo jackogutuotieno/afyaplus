@@ -74,6 +74,12 @@ $Page->showMessage();
 <?php if ($Page->email_address->Visible) { // email_address ?>
         <th class="<?= $Page->email_address->headerCellClass() ?>"><span id="elh_patients_email_address" class="patients_email_address"><?= $Page->email_address->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->county_id->Visible) { // county_id ?>
+        <th class="<?= $Page->county_id->headerCellClass() ?>"><span id="elh_patients_county_id" class="patients_county_id"><?= $Page->county_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->subcounty_id->Visible) { // subcounty_id ?>
+        <th class="<?= $Page->subcounty_id->headerCellClass() ?>"><span id="elh_patients_subcounty_id" class="patients_subcounty_id"><?= $Page->subcounty_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->date_created->Visible) { // date_created ?>
         <th class="<?= $Page->date_created->headerCellClass() ?>"><span id="elh_patients_date_created" class="patients_date_created"><?= $Page->date_created->caption() ?></span></th>
 <?php } ?>
@@ -169,6 +175,22 @@ while ($Page->fetch()) {
 <?= $Page->email_address->getViewValue() ?>
 <?php } ?>
 </span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->county_id->Visible) { // county_id ?>
+        <td<?= $Page->county_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->county_id->viewAttributes() ?>>
+<?= $Page->county_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->subcounty_id->Visible) { // subcounty_id ?>
+        <td<?= $Page->subcounty_id->cellAttributes() ?>>
+<span id="">
+<span<?= $Page->subcounty_id->viewAttributes() ?>>
+<?= $Page->subcounty_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

@@ -108,6 +108,28 @@ $patients->TableClass = "table table-bordered table-hover table-sm ew-table ew-m
 </td>
         </tr>
 <?php } ?>
+<?php if ($patients->county_id->Visible) { // county_id ?>
+        <tr id="r_county_id"<?= $patients->county_id->rowAttributes() ?>>
+            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->county_id->caption() ?></td>
+            <td<?= $patients->county_id->cellAttributes() ?>>
+<span id="el_patients_county_id">
+<span<?= $patients->county_id->viewAttributes() ?>>
+<?= $patients->county_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($patients->subcounty_id->Visible) { // subcounty_id ?>
+        <tr id="r_subcounty_id"<?= $patients->subcounty_id->rowAttributes() ?>>
+            <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->subcounty_id->caption() ?></td>
+            <td<?= $patients->subcounty_id->cellAttributes() ?>>
+<span id="el_patients_subcounty_id">
+<span<?= $patients->subcounty_id->viewAttributes() ?>>
+<?= $patients->subcounty_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($patients->date_created->Visible) { // date_created ?>
         <tr id="r_date_created"<?= $patients->date_created->rowAttributes() ?>>
             <td class="<?= $patients->TableLeftColumnClass ?>"><?= $patients->date_created->caption() ?></td>

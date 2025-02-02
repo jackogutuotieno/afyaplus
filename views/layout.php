@@ -241,8 +241,6 @@ ew.ready("head", [ew.PATH_BASE + "tinymce/tinymce.min.js?v=24.16.0", ew.PATH_BAS
     {{/if}}
 {{/if}}
 </script>
-<link rel="shortcut icon" type="image/png" href="<?= BasePath() ?>/afyaplus_logo_small.png">
-<link rel="icon" type="image/png" href="<?= BasePath() ?>/afyaplus_logo_small.png">
 <meta name="generator" content="PHPMaker 2024.16.0">
 </head>
 <body class="<?= Config("BODY_CLASS") ?>" style="<?= Config("BODY_STYLE") ?>">

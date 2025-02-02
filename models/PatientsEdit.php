@@ -141,6 +141,8 @@ class PatientsEdit extends Patients
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
+        $this->county_id->setVisibility();
+        $this->subcounty_id->setVisibility();
         $this->physical_address->setVisibility();
         $this->employment_status->setVisibility();
         $this->marital_status->setVisibility();
@@ -551,6 +553,8 @@ class PatientsEdit extends Patients
 
         // Set up lookup cache
         $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->county_id);
+        $this->setupLookupOptions($this->subcounty_id);
         $this->setupLookupOptions($this->employment_status);
         $this->setupLookupOptions($this->marital_status);
         $this->setupLookupOptions($this->religion);
@@ -829,6 +833,26 @@ class PatientsEdit extends Patients
             }
         }
 
+        // Check field name 'county_id' first before field var 'x_county_id'
+        $val = $CurrentForm->hasValue("county_id") ? $CurrentForm->getValue("county_id") : $CurrentForm->getValue("x_county_id");
+        if (!$this->county_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->county_id->Visible = false; // Disable update for API request
+            } else {
+                $this->county_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'subcounty_id' first before field var 'x_subcounty_id'
+        $val = $CurrentForm->hasValue("subcounty_id") ? $CurrentForm->getValue("subcounty_id") : $CurrentForm->getValue("x_subcounty_id");
+        if (!$this->subcounty_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->subcounty_id->Visible = false; // Disable update for API request
+            } else {
+                $this->subcounty_id->setFormValue($val);
+            }
+        }
+
         // Check field name 'physical_address' first before field var 'x_physical_address'
         $val = $CurrentForm->hasValue("physical_address") ? $CurrentForm->getValue("physical_address") : $CurrentForm->getValue("x_physical_address");
         if (!$this->physical_address->IsDetailKey) {
@@ -914,6 +938,8 @@ class PatientsEdit extends Patients
         $this->gender->CurrentValue = $this->gender->FormValue;
         $this->phone->CurrentValue = $this->phone->FormValue;
         $this->email_address->CurrentValue = $this->email_address->FormValue;
+        $this->county_id->CurrentValue = $this->county_id->FormValue;
+        $this->subcounty_id->CurrentValue = $this->subcounty_id->FormValue;
         $this->physical_address->CurrentValue = $this->physical_address->FormValue;
         $this->employment_status->CurrentValue = $this->employment_status->FormValue;
         $this->marital_status->CurrentValue = $this->marital_status->FormValue;
@@ -975,6 +1001,8 @@ class PatientsEdit extends Patients
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
+        $this->county_id->setDbValue($row['county_id']);
+        $this->subcounty_id->setDbValue($row['subcounty_id']);
         $this->physical_address->setDbValue($row['physical_address']);
         $this->employment_status->setDbValue($row['employment_status']);
         $this->marital_status->setDbValue($row['marital_status']);
@@ -1001,6 +1029,8 @@ class PatientsEdit extends Patients
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
+        $row['county_id'] = $this->county_id->DefaultValue;
+        $row['subcounty_id'] = $this->subcounty_id->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
         $row['employment_status'] = $this->employment_status->DefaultValue;
         $row['marital_status'] = $this->marital_status->DefaultValue;
@@ -1077,6 +1107,12 @@ class PatientsEdit extends Patients
         // email_address
         $this->email_address->RowCssClass = "row";
 
+        // county_id
+        $this->county_id->RowCssClass = "row";
+
+        // subcounty_id
+        $this->subcounty_id->RowCssClass = "row";
+
         // physical_address
         $this->physical_address->RowCssClass = "row";
 
@@ -1149,6 +1185,52 @@ class PatientsEdit extends Patients
 
             // email_address
             $this->email_address->ViewValue = $this->email_address->CurrentValue;
+
+            // county_id
+            $curVal = strval($this->county_id->CurrentValue);
+            if ($curVal != "") {
+                $this->county_id->ViewValue = $this->county_id->lookupCacheOption($curVal);
+                if ($this->county_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->county_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->county_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->county_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->county_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->county_id->ViewValue = $this->county_id->displayValue($arwrk);
+                    } else {
+                        $this->county_id->ViewValue = FormatNumber($this->county_id->CurrentValue, $this->county_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->county_id->ViewValue = null;
+            }
+
+            // subcounty_id
+            $curVal = strval($this->subcounty_id->CurrentValue);
+            if ($curVal != "") {
+                $this->subcounty_id->ViewValue = $this->subcounty_id->lookupCacheOption($curVal);
+                if ($this->subcounty_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->subcounty_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcounty_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->subcounty_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->subcounty_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->subcounty_id->ViewValue = $this->subcounty_id->displayValue($arwrk);
+                    } else {
+                        $this->subcounty_id->ViewValue = FormatNumber($this->subcounty_id->CurrentValue, $this->subcounty_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->subcounty_id->ViewValue = null;
+            }
 
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
@@ -1250,6 +1332,12 @@ class PatientsEdit extends Patients
                 $this->email_address->HrefValue = "";
             }
 
+            // county_id
+            $this->county_id->HrefValue = "";
+
+            // subcounty_id
+            $this->subcounty_id->HrefValue = "";
+
             // physical_address
             $this->physical_address->HrefValue = "";
 
@@ -1335,6 +1423,60 @@ class PatientsEdit extends Patients
             }
             $this->email_address->EditValue = HtmlEncode($this->email_address->CurrentValue);
             $this->email_address->PlaceHolder = RemoveHtml($this->email_address->caption());
+
+            // county_id
+            $this->county_id->setupEditAttributes();
+            $curVal = trim(strval($this->county_id->CurrentValue));
+            if ($curVal != "") {
+                $this->county_id->ViewValue = $this->county_id->lookupCacheOption($curVal);
+            } else {
+                $this->county_id->ViewValue = $this->county_id->Lookup !== null && is_array($this->county_id->lookupOptions()) && count($this->county_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->county_id->ViewValue !== null) { // Load from cache
+                $this->county_id->EditValue = array_values($this->county_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->county_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->county_id->CurrentValue, $this->county_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->county_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->county_id->EditValue = $arwrk;
+            }
+            $this->county_id->PlaceHolder = RemoveHtml($this->county_id->caption());
+
+            // subcounty_id
+            $this->subcounty_id->setupEditAttributes();
+            $curVal = trim(strval($this->subcounty_id->CurrentValue));
+            if ($curVal != "") {
+                $this->subcounty_id->ViewValue = $this->subcounty_id->lookupCacheOption($curVal);
+            } else {
+                $this->subcounty_id->ViewValue = $this->subcounty_id->Lookup !== null && is_array($this->subcounty_id->lookupOptions()) && count($this->subcounty_id->lookupOptions()) > 0 ? $curVal : null;
+            }
+            if ($this->subcounty_id->ViewValue !== null) { // Load from cache
+                $this->subcounty_id->EditValue = array_values($this->subcounty_id->lookupOptions());
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = SearchFilter($this->subcounty_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $this->subcounty_id->CurrentValue, $this->subcounty_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                }
+                $sqlWrk = $this->subcounty_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->subcounty_id->EditValue = $arwrk;
+            }
+            $this->subcounty_id->PlaceHolder = RemoveHtml($this->subcounty_id->caption());
 
             // physical_address
             $this->physical_address->setupEditAttributes();
@@ -1433,6 +1575,12 @@ class PatientsEdit extends Patients
                 $this->email_address->HrefValue = "";
             }
 
+            // county_id
+            $this->county_id->HrefValue = "";
+
+            // subcounty_id
+            $this->subcounty_id->HrefValue = "";
+
             // physical_address
             $this->physical_address->HrefValue = "";
 
@@ -1523,6 +1671,16 @@ class PatientsEdit extends Patients
             if ($this->email_address->Visible && $this->email_address->Required) {
                 if (!$this->email_address->IsDetailKey && EmptyValue($this->email_address->FormValue)) {
                     $this->email_address->addErrorMessage(str_replace("%s", $this->email_address->caption(), $this->email_address->RequiredErrorMessage));
+                }
+            }
+            if ($this->county_id->Visible && $this->county_id->Required) {
+                if (!$this->county_id->IsDetailKey && EmptyValue($this->county_id->FormValue)) {
+                    $this->county_id->addErrorMessage(str_replace("%s", $this->county_id->caption(), $this->county_id->RequiredErrorMessage));
+                }
+            }
+            if ($this->subcounty_id->Visible && $this->subcounty_id->Required) {
+                if (!$this->subcounty_id->IsDetailKey && EmptyValue($this->subcounty_id->FormValue)) {
+                    $this->subcounty_id->addErrorMessage(str_replace("%s", $this->subcounty_id->caption(), $this->subcounty_id->RequiredErrorMessage));
                 }
             }
             if ($this->physical_address->Visible && $this->physical_address->Required) {
@@ -1799,6 +1957,12 @@ class PatientsEdit extends Patients
         // email_address
         $this->email_address->setDbValueDef($rsnew, $this->email_address->CurrentValue, $this->email_address->ReadOnly);
 
+        // county_id
+        $this->county_id->setDbValueDef($rsnew, $this->county_id->CurrentValue, $this->county_id->ReadOnly);
+
+        // subcounty_id
+        $this->subcounty_id->setDbValueDef($rsnew, $this->subcounty_id->CurrentValue, $this->subcounty_id->ReadOnly);
+
         // physical_address
         $this->physical_address->setDbValueDef($rsnew, $this->physical_address->CurrentValue, $this->physical_address->ReadOnly);
 
@@ -1855,6 +2019,12 @@ class PatientsEdit extends Patients
         }
         if (isset($row['email_address'])) { // email_address
             $this->email_address->CurrentValue = $row['email_address'];
+        }
+        if (isset($row['county_id'])) { // county_id
+            $this->county_id->CurrentValue = $row['county_id'];
+        }
+        if (isset($row['subcounty_id'])) { // subcounty_id
+            $this->subcounty_id->CurrentValue = $row['subcounty_id'];
         }
         if (isset($row['physical_address'])) { // physical_address
             $this->physical_address->CurrentValue = $row['physical_address'];
@@ -1964,6 +2134,10 @@ class PatientsEdit extends Patients
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_gender":
+                    break;
+                case "x_county_id":
+                    break;
+                case "x_subcounty_id":
                     break;
                 case "x_employment_status":
                     break;

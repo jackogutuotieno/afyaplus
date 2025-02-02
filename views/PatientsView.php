@@ -95,6 +95,28 @@ loadjs.ready("head", function () {
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->county_id->Visible) { // county_id ?>
+    <tr id="r_county_id"<?= $Page->county_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_county_id"><template id="tpc_patients_county_id"><?= $Page->county_id->caption() ?></template></span></td>
+        <td data-name="county_id"<?= $Page->county_id->cellAttributes() ?>>
+<template id="tpx_patients_county_id"><span id="el_patients_county_id">
+<span<?= $Page->county_id->viewAttributes() ?>>
+<?= $Page->county_id->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->subcounty_id->Visible) { // subcounty_id ?>
+    <tr id="r_subcounty_id"<?= $Page->subcounty_id->rowAttributes() ?>>
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_subcounty_id"><template id="tpc_patients_subcounty_id"><?= $Page->subcounty_id->caption() ?></template></span></td>
+        <td data-name="subcounty_id"<?= $Page->subcounty_id->cellAttributes() ?>>
+<template id="tpx_patients_subcounty_id"><span id="el_patients_subcounty_id">
+<span<?= $Page->subcounty_id->viewAttributes() ?>>
+<?= $Page->subcounty_id->getViewValue() ?></span>
+</span></template>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->is_ipd->Visible) { // is_ipd ?>
     <tr id="r_is_ipd"<?= $Page->is_ipd->rowAttributes() ?>>
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_patients_is_ipd"><template id="tpc_patients_is_ipd"><?= $Page->is_ipd->caption() ?></template></span></td>

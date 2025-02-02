@@ -193,6 +193,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->next_of_kin_phone->Visible) { // next_of_kin_phone ?>
         <th data-name="next_of_kin_phone" class="<?= $Page->next_of_kin_phone->headerCellClass() ?>"><div id="elh_moh204a_report_next_of_kin_phone" class="moh204a_report_next_of_kin_phone"><?= $Page->renderFieldHeader($Page->next_of_kin_phone) ?></div></th>
 <?php } ?>
+<?php if ($Page->countyName->Visible) { // countyName ?>
+        <th data-name="countyName" class="<?= $Page->countyName->headerCellClass() ?>"><div id="elh_moh204a_report_countyName" class="moh204a_report_countyName"><?= $Page->renderFieldHeader($Page->countyName) ?></div></th>
+<?php } ?>
+<?php if ($Page->subCounty->Visible) { // subCounty ?>
+        <th data-name="subCounty" class="<?= $Page->subCounty->headerCellClass() ?>"><div id="elh_moh204a_report_subCounty" class="moh204a_report_subCounty"><?= $Page->renderFieldHeader($Page->subCounty) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -298,6 +304,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_moh204a_report_next_of_kin_phone" class="el_moh204a_report_next_of_kin_phone">
 <span<?= $Page->next_of_kin_phone->viewAttributes() ?>>
 <?= $Page->next_of_kin_phone->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->countyName->Visible) { // countyName ?>
+        <td data-name="countyName"<?= $Page->countyName->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_moh204a_report_countyName" class="el_moh204a_report_countyName">
+<span<?= $Page->countyName->viewAttributes() ?>>
+<?= $Page->countyName->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->subCounty->Visible) { // subCounty ?>
+        <td data-name="subCounty"<?= $Page->subCounty->cellAttributes() ?>>
+<span id="el<?= $Page->RowIndex == '$rowindex$' ? '$rowindex$' : $Page->RowCount ?>_moh204a_report_subCounty" class="el_moh204a_report_subCounty">
+<span<?= $Page->subCounty->viewAttributes() ?>>
+<?= $Page->subCounty->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

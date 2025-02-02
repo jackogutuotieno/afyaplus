@@ -66,6 +66,8 @@ class Patients extends DbTable
     public $gender;
     public $phone;
     public $email_address;
+    public $county_id;
+    public $subcounty_id;
     public $physical_address;
     public $employment_status;
     public $marital_status;
@@ -397,6 +399,66 @@ class Patients extends DbTable
         $this->email_address->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->email_address->CustomMsg = $Language->fieldPhrase($this->TableVar, $this->email_address->Param, "CustomMsg");
         $this->Fields['email_address'] = &$this->email_address;
+
+        // county_id
+        $this->county_id = new DbField(
+            $this, // Table
+            'x_county_id', // Variable name
+            'county_id', // Name
+            '`county_id`', // Expression
+            '`county_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`county_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->county_id->InputTextType = "text";
+        $this->county_id->Raw = true;
+        $this->county_id->Nullable = false; // NOT NULL field
+        $this->county_id->Required = true; // Required field
+        $this->county_id->setSelectMultiple(false); // Select one
+        $this->county_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->county_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->county_id->Lookup = new Lookup($this->county_id, 'county', false, 'id', ["countyName","","",""], '', '', [], ["x_subcounty_id"], [], [], [], [], false, '', '', "`countyName`");
+        $this->county_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->county_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['county_id'] = &$this->county_id;
+
+        // subcounty_id
+        $this->subcounty_id = new DbField(
+            $this, // Table
+            'x_subcounty_id', // Variable name
+            'subcounty_id', // Name
+            '`subcounty_id`', // Expression
+            '`subcounty_id`', // Basic search expression
+            3, // Type
+            11, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`subcounty_id`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'SELECT' // Edit Tag
+        );
+        $this->subcounty_id->InputTextType = "text";
+        $this->subcounty_id->Raw = true;
+        $this->subcounty_id->Nullable = false; // NOT NULL field
+        $this->subcounty_id->Required = true; // Required field
+        $this->subcounty_id->setSelectMultiple(false); // Select one
+        $this->subcounty_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->subcounty_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->subcounty_id->Lookup = new Lookup($this->subcounty_id, 'sub_county', false, 'id', ["subCounty","","",""], '', '', ["x_county_id"], [], ["county_id"], ["x_county_id"], [], [], false, '', '', "`subCounty`");
+        $this->subcounty_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->subcounty_id->SearchOperators = ["=", "<>", "<", "<=", ">", ">=", "BETWEEN", "NOT BETWEEN"];
+        $this->Fields['subcounty_id'] = &$this->subcounty_id;
 
         // physical_address
         $this->physical_address = new DbField(
@@ -1194,6 +1256,8 @@ class Patients extends DbTable
         $this->gender->DbValue = $row['gender'];
         $this->phone->DbValue = $row['phone'];
         $this->email_address->DbValue = $row['email_address'];
+        $this->county_id->DbValue = $row['county_id'];
+        $this->subcounty_id->DbValue = $row['subcounty_id'];
         $this->physical_address->DbValue = $row['physical_address'];
         $this->employment_status->DbValue = $row['employment_status'];
         $this->marital_status->DbValue = $row['marital_status'];
@@ -1574,6 +1638,8 @@ class Patients extends DbTable
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
+        $this->county_id->setDbValue($row['county_id']);
+        $this->subcounty_id->setDbValue($row['subcounty_id']);
         $this->physical_address->setDbValue($row['physical_address']);
         $this->employment_status->setDbValue($row['employment_status']);
         $this->marital_status->setDbValue($row['marital_status']);
@@ -1634,6 +1700,10 @@ class Patients extends DbTable
         // phone
 
         // email_address
+
+        // county_id
+
+        // subcounty_id
 
         // physical_address
 
@@ -1696,6 +1766,52 @@ class Patients extends DbTable
 
         // email_address
         $this->email_address->ViewValue = $this->email_address->CurrentValue;
+
+        // county_id
+        $curVal = strval($this->county_id->CurrentValue);
+        if ($curVal != "") {
+            $this->county_id->ViewValue = $this->county_id->lookupCacheOption($curVal);
+            if ($this->county_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->county_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->county_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->county_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->county_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->county_id->ViewValue = $this->county_id->displayValue($arwrk);
+                } else {
+                    $this->county_id->ViewValue = FormatNumber($this->county_id->CurrentValue, $this->county_id->formatPattern());
+                }
+            }
+        } else {
+            $this->county_id->ViewValue = null;
+        }
+
+        // subcounty_id
+        $curVal = strval($this->subcounty_id->CurrentValue);
+        if ($curVal != "") {
+            $this->subcounty_id->ViewValue = $this->subcounty_id->lookupCacheOption($curVal);
+            if ($this->subcounty_id->ViewValue === null) { // Lookup from database
+                $filterWrk = SearchFilter($this->subcounty_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcounty_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                $sqlWrk = $this->subcounty_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $conn = Conn();
+                $config = $conn->getConfiguration();
+                $config->setResultCache($this->Cache);
+                $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->subcounty_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->subcounty_id->ViewValue = $this->subcounty_id->displayValue($arwrk);
+                } else {
+                    $this->subcounty_id->ViewValue = FormatNumber($this->subcounty_id->CurrentValue, $this->subcounty_id->formatPattern());
+                }
+            }
+        } else {
+            $this->subcounty_id->ViewValue = null;
+        }
 
         // physical_address
         $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
@@ -1813,6 +1929,14 @@ class Patients extends DbTable
             $this->email_address->HrefValue = "";
         }
         $this->email_address->TooltipValue = "";
+
+        // county_id
+        $this->county_id->HrefValue = "";
+        $this->county_id->TooltipValue = "";
+
+        // subcounty_id
+        $this->subcounty_id->HrefValue = "";
+        $this->subcounty_id->TooltipValue = "";
 
         // physical_address
         $this->physical_address->HrefValue = "";
@@ -1943,6 +2067,14 @@ class Patients extends DbTable
         $this->email_address->EditValue = $this->email_address->CurrentValue;
         $this->email_address->PlaceHolder = RemoveHtml($this->email_address->caption());
 
+        // county_id
+        $this->county_id->setupEditAttributes();
+        $this->county_id->PlaceHolder = RemoveHtml($this->county_id->caption());
+
+        // subcounty_id
+        $this->subcounty_id->setupEditAttributes();
+        $this->subcounty_id->PlaceHolder = RemoveHtml($this->subcounty_id->caption());
+
         // physical_address
         $this->physical_address->setupEditAttributes();
         $this->physical_address->EditValue = $this->physical_address->CurrentValue;
@@ -2025,6 +2157,8 @@ class Patients extends DbTable
                     $doc->exportCaption($this->patient_name);
                     $doc->exportCaption($this->age);
                     $doc->exportCaption($this->gender);
+                    $doc->exportCaption($this->county_id);
+                    $doc->exportCaption($this->subcounty_id);
                     $doc->exportCaption($this->is_ipd);
                 } else {
                     $doc->exportCaption($this->id);
@@ -2036,6 +2170,8 @@ class Patients extends DbTable
                     $doc->exportCaption($this->gender);
                     $doc->exportCaption($this->phone);
                     $doc->exportCaption($this->email_address);
+                    $doc->exportCaption($this->county_id);
+                    $doc->exportCaption($this->subcounty_id);
                     $doc->exportCaption($this->physical_address);
                     $doc->exportCaption($this->employment_status);
                     $doc->exportCaption($this->marital_status);
@@ -2075,6 +2211,8 @@ class Patients extends DbTable
                         $doc->exportField($this->patient_name);
                         $doc->exportField($this->age);
                         $doc->exportField($this->gender);
+                        $doc->exportField($this->county_id);
+                        $doc->exportField($this->subcounty_id);
                         $doc->exportField($this->is_ipd);
                     } else {
                         $doc->exportField($this->id);
@@ -2086,6 +2224,8 @@ class Patients extends DbTable
                         $doc->exportField($this->gender);
                         $doc->exportField($this->phone);
                         $doc->exportField($this->email_address);
+                        $doc->exportField($this->county_id);
+                        $doc->exportField($this->subcounty_id);
                         $doc->exportField($this->physical_address);
                         $doc->exportField($this->employment_status);
                         $doc->exportField($this->marital_status);

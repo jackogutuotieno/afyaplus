@@ -141,6 +141,8 @@ class PatientsDelete extends Patients
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
+        $this->county_id->setVisibility();
+        $this->subcounty_id->setVisibility();
         $this->physical_address->Visible = false;
         $this->employment_status->Visible = false;
         $this->marital_status->Visible = false;
@@ -440,6 +442,8 @@ class PatientsDelete extends Patients
 
         // Set up lookup cache
         $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->county_id);
+        $this->setupLookupOptions($this->subcounty_id);
         $this->setupLookupOptions($this->employment_status);
         $this->setupLookupOptions($this->marital_status);
         $this->setupLookupOptions($this->religion);
@@ -641,6 +645,8 @@ class PatientsDelete extends Patients
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
+        $this->county_id->setDbValue($row['county_id']);
+        $this->subcounty_id->setDbValue($row['subcounty_id']);
         $this->physical_address->setDbValue($row['physical_address']);
         $this->employment_status->setDbValue($row['employment_status']);
         $this->marital_status->setDbValue($row['marital_status']);
@@ -667,6 +673,8 @@ class PatientsDelete extends Patients
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
+        $row['county_id'] = $this->county_id->DefaultValue;
+        $row['subcounty_id'] = $this->subcounty_id->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
         $row['employment_status'] = $this->employment_status->DefaultValue;
         $row['marital_status'] = $this->marital_status->DefaultValue;
@@ -712,6 +720,10 @@ class PatientsDelete extends Patients
         // phone
 
         // email_address
+
+        // county_id
+
+        // subcounty_id
 
         // physical_address
 
@@ -770,6 +782,52 @@ class PatientsDelete extends Patients
 
             // email_address
             $this->email_address->ViewValue = $this->email_address->CurrentValue;
+
+            // county_id
+            $curVal = strval($this->county_id->CurrentValue);
+            if ($curVal != "") {
+                $this->county_id->ViewValue = $this->county_id->lookupCacheOption($curVal);
+                if ($this->county_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->county_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->county_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->county_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->county_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->county_id->ViewValue = $this->county_id->displayValue($arwrk);
+                    } else {
+                        $this->county_id->ViewValue = FormatNumber($this->county_id->CurrentValue, $this->county_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->county_id->ViewValue = null;
+            }
+
+            // subcounty_id
+            $curVal = strval($this->subcounty_id->CurrentValue);
+            if ($curVal != "") {
+                $this->subcounty_id->ViewValue = $this->subcounty_id->lookupCacheOption($curVal);
+                if ($this->subcounty_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->subcounty_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcounty_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->subcounty_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->subcounty_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->subcounty_id->ViewValue = $this->subcounty_id->displayValue($arwrk);
+                    } else {
+                        $this->subcounty_id->ViewValue = FormatNumber($this->subcounty_id->CurrentValue, $this->subcounty_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->subcounty_id->ViewValue = null;
+            }
 
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
@@ -863,6 +921,14 @@ class PatientsDelete extends Patients
                 $this->email_address->HrefValue = "";
             }
             $this->email_address->TooltipValue = "";
+
+            // county_id
+            $this->county_id->HrefValue = "";
+            $this->county_id->TooltipValue = "";
+
+            // subcounty_id
+            $this->subcounty_id->HrefValue = "";
+            $this->subcounty_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -1028,6 +1094,10 @@ class PatientsDelete extends Patients
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_gender":
+                    break;
+                case "x_county_id":
+                    break;
+                case "x_subcounty_id":
                     break;
                 case "x_employment_status":
                     break;

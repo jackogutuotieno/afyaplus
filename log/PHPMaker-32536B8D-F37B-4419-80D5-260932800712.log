@@ -8,10 +8,12 @@ C:\wamp64\www\afyaplus\controllers\AppointmentsReport2Controller.php
 C:\wamp64\www\afyaplus\controllers\AppointmentsReportController.php
 C:\wamp64\www\afyaplus\controllers\BedAssignmentController.php
 C:\wamp64\www\afyaplus\controllers\BedsController.php
+C:\wamp64\www\afyaplus\controllers\BedsStatusController.php
 C:\wamp64\www\afyaplus\controllers\BrandingController.php
 C:\wamp64\www\afyaplus\controllers\CashPaymentsController.php
 C:\wamp64\www\afyaplus\controllers\CashPaymentsReportController.php
 C:\wamp64\www\afyaplus\controllers\ControllerBase.php
+C:\wamp64\www\afyaplus\controllers\CountyController.php
 C:\wamp64\www\afyaplus\controllers\DepartmentsController.php
 C:\wamp64\www\afyaplus\controllers\DesignationsController.php
 C:\wamp64\www\afyaplus\controllers\DiagnosisController.php
@@ -80,6 +82,8 @@ C:\wamp64\www\afyaplus\controllers\MedicineSuppliersController.php
 C:\wamp64\www\afyaplus\controllers\ModulesController.php
 C:\wamp64\www\afyaplus\controllers\Moh204aReportController.php
 C:\wamp64\www\afyaplus\controllers\Moh204bReportController.php
+C:\wamp64\www\afyaplus\controllers\Moh704aReportController.php
+C:\wamp64\www\afyaplus\controllers\Moh704bReportController.php
 C:\wamp64\www\afyaplus\controllers\OpdBillMasterReportController.php
 C:\wamp64\www\afyaplus\controllers\OpdBillTotalController.php
 C:\wamp64\www\afyaplus\controllers\OpdConsultationController.php
@@ -128,6 +132,7 @@ C:\wamp64\www\afyaplus\controllers\RegisteredPatientsReportController.php
 C:\wamp64\www\afyaplus\controllers\ServiceCategoriesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceChargesController.php
 C:\wamp64\www\afyaplus\controllers\ServiceSubcategoriesController.php
+C:\wamp64\www\afyaplus\controllers\SubCountyController.php
 C:\wamp64\www\afyaplus\controllers\SubscriptionsController.php
 C:\wamp64\www\afyaplus\controllers\SuppliersController.php
 C:\wamp64\www\afyaplus\controllers\TriageOverviewController.php
@@ -175,6 +180,8 @@ C:\wamp64\www\afyaplus\models\BedsDelete.php
 C:\wamp64\www\afyaplus\models\BedsEdit.php
 C:\wamp64\www\afyaplus\models\BedsGrid.php
 C:\wamp64\www\afyaplus\models\BedsList.php
+C:\wamp64\www\afyaplus\models\BedsStatus.php
+C:\wamp64\www\afyaplus\models\BedsStatusList.php
 C:\wamp64\www\afyaplus\models\Branding.php
 C:\wamp64\www\afyaplus\models\BrandingDelete.php
 C:\wamp64\www\afyaplus\models\BrandingEdit.php
@@ -190,6 +197,12 @@ C:\wamp64\www\afyaplus\models\CashPaymentsReport.php
 C:\wamp64\www\afyaplus\models\CashPaymentsReportList.php
 C:\wamp64\www\afyaplus\models\CashPaymentsView.php
 C:\wamp64\www\afyaplus\models\ChangePassword.php
+C:\wamp64\www\afyaplus\models\County.php
+C:\wamp64\www\afyaplus\models\CountyAdd.php
+C:\wamp64\www\afyaplus\models\CountyDelete.php
+C:\wamp64\www\afyaplus\models\CountyEdit.php
+C:\wamp64\www\afyaplus\models\CountyList.php
+C:\wamp64\www\afyaplus\models\CountyView.php
 C:\wamp64\www\afyaplus\models\Departments.php
 C:\wamp64\www\afyaplus\models\DepartmentsAdd.php
 C:\wamp64\www\afyaplus\models\DepartmentsDelete.php
@@ -476,6 +489,10 @@ C:\wamp64\www\afyaplus\models\Moh204aReport.php
 C:\wamp64\www\afyaplus\models\Moh204aReportList.php
 C:\wamp64\www\afyaplus\models\Moh204bReport.php
 C:\wamp64\www\afyaplus\models\Moh204bReportList.php
+C:\wamp64\www\afyaplus\models\Moh704aReport.php
+C:\wamp64\www\afyaplus\models\Moh704aReportList.php
+C:\wamp64\www\afyaplus\models\Moh704bReport.php
+C:\wamp64\www\afyaplus\models\Moh704bReportList.php
 C:\wamp64\www\afyaplus\models\OpdBillMasterReport.php
 C:\wamp64\www\afyaplus\models\OpdBillMasterReportList.php
 C:\wamp64\www\afyaplus\models\OpdBillMasterReportView.php
@@ -696,6 +713,12 @@ C:\wamp64\www\afyaplus\models\ServiceSubcategoriesDelete.php
 C:\wamp64\www\afyaplus\models\ServiceSubcategoriesEdit.php
 C:\wamp64\www\afyaplus\models\ServiceSubcategoriesList.php
 C:\wamp64\www\afyaplus\models\ServiceSubcategoriesView.php
+C:\wamp64\www\afyaplus\models\SubCounty.php
+C:\wamp64\www\afyaplus\models\SubCountyAdd.php
+C:\wamp64\www\afyaplus\models\SubCountyDelete.php
+C:\wamp64\www\afyaplus\models\SubCountyEdit.php
+C:\wamp64\www\afyaplus\models\SubCountyList.php
+C:\wamp64\www\afyaplus\models\SubCountyView.php
 C:\wamp64\www\afyaplus\models\Subscriptions.php
 C:\wamp64\www\afyaplus\models\SubscriptionsAdd.php
 C:\wamp64\www\afyaplus\models\SubscriptionsDelete.php
@@ -796,9 +819,11 @@ C:\wamp64\www\afyaplus\src\EntityDescriptor.php
 C:\wamp64\www\afyaplus\src\Entity\AppointmentsReport.php
 C:\wamp64\www\afyaplus\src\Entity\Bed.php
 C:\wamp64\www\afyaplus\src\Entity\BedAssignment.php
+C:\wamp64\www\afyaplus\src\Entity\BedsStatus.php
 C:\wamp64\www\afyaplus\src\Entity\Branding.php
 C:\wamp64\www\afyaplus\src\Entity\CashPayment.php
 C:\wamp64\www\afyaplus\src\Entity\CashPaymentsReport.php
+C:\wamp64\www\afyaplus\src\Entity\County.php
 C:\wamp64\www\afyaplus\src\Entity\Department.php
 C:\wamp64\www\afyaplus\src\Entity\Designation.php
 C:\wamp64\www\afyaplus\src\Entity\Diagnosis.php
@@ -855,6 +880,8 @@ C:\wamp64\www\afyaplus\src\Entity\MedicineSupplier.php
 C:\wamp64\www\afyaplus\src\Entity\Module.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204AReport.php
 C:\wamp64\www\afyaplus\src\Entity\Moh204BReport.php
+C:\wamp64\www\afyaplus\src\Entity\Moh704AReport.php
+C:\wamp64\www\afyaplus\src\Entity\Moh704BReport.php
 C:\wamp64\www\afyaplus\src\Entity\OpdBillMasterReport.php
 C:\wamp64\www\afyaplus\src\Entity\OpdBillTotal.php
 C:\wamp64\www\afyaplus\src\Entity\OpdConsultation.php
@@ -895,6 +922,7 @@ C:\wamp64\www\afyaplus\src\Entity\RegisteredPatientsReport.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCategory.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceCharge.php
 C:\wamp64\www\afyaplus\src\Entity\ServiceSubcategory.php
+C:\wamp64\www\afyaplus\src\Entity\SubCounty.php
 C:\wamp64\www\afyaplus\src\Entity\Subscription.php
 C:\wamp64\www\afyaplus\src\Entity\Supplier.php
 C:\wamp64\www\afyaplus\src\Entity\User.php
@@ -1013,6 +1041,7 @@ C:\wamp64\www\afyaplus\views\BedsDelete.php
 C:\wamp64\www\afyaplus\views\BedsEdit.php
 C:\wamp64\www\afyaplus\views\BedsGrid.php
 C:\wamp64\www\afyaplus\views\BedsList.php
+C:\wamp64\www\afyaplus\views\BedsStatusList.php
 C:\wamp64\www\afyaplus\views\BrandingDelete.php
 C:\wamp64\www\afyaplus\views\BrandingEdit.php
 C:\wamp64\www\afyaplus\views\BrandingList.php
@@ -1025,6 +1054,11 @@ C:\wamp64\www\afyaplus\views\CashPaymentsList.php
 C:\wamp64\www\afyaplus\views\CashPaymentsReportList.php
 C:\wamp64\www\afyaplus\views\CashPaymentsView.php
 C:\wamp64\www\afyaplus\views\ChangePassword.php
+C:\wamp64\www\afyaplus\views\CountyAdd.php
+C:\wamp64\www\afyaplus\views\CountyDelete.php
+C:\wamp64\www\afyaplus\views\CountyEdit.php
+C:\wamp64\www\afyaplus\views\CountyList.php
+C:\wamp64\www\afyaplus\views\CountyView.php
 C:\wamp64\www\afyaplus\views\DepartmentsAdd.php
 C:\wamp64\www\afyaplus\views\DepartmentsDelete.php
 C:\wamp64\www\afyaplus\views\DepartmentsEdit.php
@@ -1259,6 +1293,8 @@ C:\wamp64\www\afyaplus\views\ModulesList.php
 C:\wamp64\www\afyaplus\views\ModulesView.php
 C:\wamp64\www\afyaplus\views\Moh204aReportList.php
 C:\wamp64\www\afyaplus\views\Moh204bReportList.php
+C:\wamp64\www\afyaplus\views\Moh704aReportList.php
+C:\wamp64\www\afyaplus\views\Moh704bReportList.php
 C:\wamp64\www\afyaplus\views\OpdBillMasterReportList.php
 C:\wamp64\www\afyaplus\views\OpdBillMasterReportMaster.php
 C:\wamp64\www\afyaplus\views\OpdBillMasterReportView.php
@@ -1446,6 +1482,11 @@ C:\wamp64\www\afyaplus\views\ServiceSubcategoriesDelete.php
 C:\wamp64\www\afyaplus\views\ServiceSubcategoriesEdit.php
 C:\wamp64\www\afyaplus\views\ServiceSubcategoriesList.php
 C:\wamp64\www\afyaplus\views\ServiceSubcategoriesView.php
+C:\wamp64\www\afyaplus\views\SubCountyAdd.php
+C:\wamp64\www\afyaplus\views\SubCountyDelete.php
+C:\wamp64\www\afyaplus\views\SubCountyEdit.php
+C:\wamp64\www\afyaplus\views\SubCountyList.php
+C:\wamp64\www\afyaplus\views\SubCountyView.php
 C:\wamp64\www\afyaplus\views\SubscriptionsAdd.php
 C:\wamp64\www\afyaplus\views\SubscriptionsDelete.php
 C:\wamp64\www\afyaplus\views\SubscriptionsEdit.php

@@ -69,6 +69,12 @@ class Moh204BReport extends AbstractEntity
     #[Column(name: "registration_month", type: "string", nullable: true)]
     private ?string $registrationMonth;
 
+    #[Column(type: "string")]
+    private string $countyName;
+
+    #[Column(type: "string", nullable: true)]
+    private ?string $subCounty;
+
     public function getId(): int
     {
         return $this->id;
@@ -209,6 +215,28 @@ class Moh204BReport extends AbstractEntity
     public function setRegistrationMonth(?string $value): static
     {
         $this->registrationMonth = RemoveXss($value);
+        return $this;
+    }
+
+    public function getCountyName(): string
+    {
+        return HtmlDecode($this->countyName);
+    }
+
+    public function setCountyName(string $value): static
+    {
+        $this->countyName = RemoveXss($value);
+        return $this;
+    }
+
+    public function getSubCounty(): ?string
+    {
+        return HtmlDecode($this->subCounty);
+    }
+
+    public function setSubCounty(?string $value): static
+    {
+        $this->subCounty = RemoveXss($value);
         return $this;
     }
 }

@@ -57,6 +57,12 @@ class Patient extends AbstractEntity
     #[Column(name: "email_address", type: "string", nullable: true)]
     private ?string $emailAddress;
 
+    #[Column(name: "county_id", type: "integer")]
+    private int $countyId;
+
+    #[Column(name: "subcounty_id", type: "integer")]
+    private int $subcountyId;
+
     #[Column(name: "physical_address", type: "text", nullable: true)]
     private ?string $physicalAddress;
 
@@ -185,6 +191,28 @@ class Patient extends AbstractEntity
     public function setEmailAddress(?string $value): static
     {
         $this->emailAddress = RemoveXss($value);
+        return $this;
+    }
+
+    public function getCountyId(): int
+    {
+        return $this->countyId;
+    }
+
+    public function setCountyId(int $value): static
+    {
+        $this->countyId = $value;
+        return $this;
+    }
+
+    public function getSubcountyId(): int
+    {
+        return $this->subcountyId;
+    }
+
+    public function setSubcountyId(int $value): static
+    {
+        $this->subcountyId = $value;
         return $this;
     }
 

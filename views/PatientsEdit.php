@@ -37,6 +37,8 @@ loadjs.ready(["wrapper", "head"], function () {
             ["gender", [fields.gender.visible && fields.gender.required ? ew.Validators.required(fields.gender.caption) : null], fields.gender.isInvalid],
             ["phone", [fields.phone.visible && fields.phone.required ? ew.Validators.required(fields.phone.caption) : null], fields.phone.isInvalid],
             ["email_address", [fields.email_address.visible && fields.email_address.required ? ew.Validators.required(fields.email_address.caption) : null], fields.email_address.isInvalid],
+            ["county_id", [fields.county_id.visible && fields.county_id.required ? ew.Validators.required(fields.county_id.caption) : null], fields.county_id.isInvalid],
+            ["subcounty_id", [fields.subcounty_id.visible && fields.subcounty_id.required ? ew.Validators.required(fields.subcounty_id.caption) : null], fields.subcounty_id.isInvalid],
             ["physical_address", [fields.physical_address.visible && fields.physical_address.required ? ew.Validators.required(fields.physical_address.caption) : null], fields.physical_address.isInvalid],
             ["employment_status", [fields.employment_status.visible && fields.employment_status.required ? ew.Validators.required(fields.employment_status.caption) : null], fields.employment_status.isInvalid],
             ["marital_status", [fields.marital_status.visible && fields.marital_status.required ? ew.Validators.required(fields.marital_status.caption) : null], fields.marital_status.isInvalid],
@@ -60,6 +62,8 @@ loadjs.ready(["wrapper", "head"], function () {
         // Dynamic selection lists
         .setLists({
             "gender": <?= $Page->gender->toClientList($Page) ?>,
+            "county_id": <?= $Page->county_id->toClientList($Page) ?>,
+            "subcounty_id": <?= $Page->subcounty_id->toClientList($Page) ?>,
             "employment_status": <?= $Page->employment_status->toClientList($Page) ?>,
             "marital_status": <?= $Page->marital_status->toClientList($Page) ?>,
             "religion": <?= $Page->religion->toClientList($Page) ?>,
@@ -263,6 +267,99 @@ loadjs.ready(["fpatientsedit", "datetimepicker"], function () {
 <input type="<?= $Page->email_address->getInputTextType() ?>" name="x_email_address" id="x_email_address" data-table="patients" data-field="x_email_address" value="<?= $Page->email_address->EditValue ?>" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->email_address->getPlaceHolder()) ?>" data-format-pattern="<?= HtmlEncode($Page->email_address->formatPattern()) ?>"<?= $Page->email_address->editAttributes() ?> aria-describedby="x_email_address_help">
 <?= $Page->email_address->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->email_address->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->county_id->Visible) { // county_id ?>
+    <div id="r_county_id"<?= $Page->county_id->rowAttributes() ?>>
+        <label id="elh_patients_county_id" for="x_county_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->county_id->caption() ?><?= $Page->county_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->county_id->cellAttributes() ?>>
+<span id="el_patients_county_id">
+    <select
+        id="x_county_id"
+        name="x_county_id"
+        class="form-select ew-select<?= $Page->county_id->isInvalidClass() ?>"
+        <?php if (!$Page->county_id->IsNativeSelect) { ?>
+        data-select2-id="fpatientsedit_x_county_id"
+        <?php } ?>
+        data-table="patients"
+        data-field="x_county_id"
+        data-value-separator="<?= $Page->county_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->county_id->getPlaceHolder()) ?>"
+        data-ew-action="update-options"
+        <?= $Page->county_id->editAttributes() ?>>
+        <?= $Page->county_id->selectOptionListHtml("x_county_id") ?>
+    </select>
+    <?= $Page->county_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->county_id->getErrorMessage() ?></div>
+<?= $Page->county_id->Lookup->getParamTag($Page, "p_x_county_id") ?>
+<?php if (!$Page->county_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatientsedit", function() {
+    var options = { name: "x_county_id", selectId: "fpatientsedit_x_county_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatientsedit.lists.county_id?.lookupOptions.length) {
+        options.data = { id: "x_county_id", form: "fpatientsedit" };
+    } else {
+        options.ajax = { id: "x_county_id", form: "fpatientsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.county_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->subcounty_id->Visible) { // subcounty_id ?>
+    <div id="r_subcounty_id"<?= $Page->subcounty_id->rowAttributes() ?>>
+        <label id="elh_patients_subcounty_id" for="x_subcounty_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->subcounty_id->caption() ?><?= $Page->subcounty_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div<?= $Page->subcounty_id->cellAttributes() ?>>
+<span id="el_patients_subcounty_id">
+    <select
+        id="x_subcounty_id"
+        name="x_subcounty_id"
+        class="form-select ew-select<?= $Page->subcounty_id->isInvalidClass() ?>"
+        <?php if (!$Page->subcounty_id->IsNativeSelect) { ?>
+        data-select2-id="fpatientsedit_x_subcounty_id"
+        <?php } ?>
+        data-table="patients"
+        data-field="x_subcounty_id"
+        data-value-separator="<?= $Page->subcounty_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->subcounty_id->getPlaceHolder()) ?>"
+        <?= $Page->subcounty_id->editAttributes() ?>>
+        <?= $Page->subcounty_id->selectOptionListHtml("x_subcounty_id") ?>
+    </select>
+    <?= $Page->subcounty_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->subcounty_id->getErrorMessage() ?></div>
+<?= $Page->subcounty_id->Lookup->getParamTag($Page, "p_x_subcounty_id") ?>
+<?php if (!$Page->subcounty_id->IsNativeSelect) { ?>
+<script>
+loadjs.ready("fpatientsedit", function() {
+    var options = { name: "x_subcounty_id", selectId: "fpatientsedit_x_subcounty_id" },
+        el = document.querySelector("select[data-select2-id='" + options.selectId + "']");
+    if (!el)
+        return;
+    options.closeOnSelect = !options.multiple;
+    options.dropdownParent = el.closest("#ew-modal-dialog, #ew-add-opt-dialog");
+    if (fpatientsedit.lists.subcounty_id?.lookupOptions.length) {
+        options.data = { id: "x_subcounty_id", form: "fpatientsedit" };
+    } else {
+        options.ajax = { id: "x_subcounty_id", form: "fpatientsedit", limit: ew.LOOKUP_PAGE_SIZE };
+    }
+    options.minimumResultsForSearch = Infinity;
+    options = Object.assign({}, ew.selectOptions, options, ew.vars.tables.patients.fields.subcounty_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
 </span>
 </div></div>
     </div>

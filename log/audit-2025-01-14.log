@@ -85,3 +85,5 @@ date/time,script,user,action,table,field,"key value","old value","new value"
 "2025-01-14 12:26:57",/afyaplus/bedsedit/40,1,U,beds,ward_type_id,40,0,3
 "2025-01-14 12:27:37",/afyaplus/bedsedit/41,1,U,beds,floor_id,41,0,2
 "2025-01-14 12:27:37",/afyaplus/bedsedit/41,1,U,beds,ward_type_id,41,0,3
+"2025-01-14 18:56:33",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-14 18:56:44",/afyaplus/login,1,login,::1,,,,

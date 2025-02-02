@@ -1,0 +1,14 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2025-02-02 18:05:23",/afyaplus/login,1,login,::1,,,,
+"2025-02-02 18:19:08",/afyaplus/patientsedit/2,1,U,patients,county_id,2,0,2
+"2025-02-02 18:19:08",/afyaplus/patientsedit/2,1,U,patients,subcounty_id,2,0,7
+"2025-02-02 18:19:08",/afyaplus/patientsedit/2,1,U,patients,physical_address,2,"Box 001 - 00100, Nairobi.","<p>Box 001 - 00100, Nairobi.</p>"
+"2025-02-02 18:19:08",/afyaplus/patientsedit/2,1,U,patients,religion,2,Christianity,
+"2025-02-02 18:24:37",/afyaplus/patientsedit/3,1,U,patients,county_id,3,0,47
+"2025-02-02 18:24:37",/afyaplus/patientsedit/3,1,U,patients,subcounty_id,3,0,312
+"2025-02-02 18:24:37",/afyaplus/patientsedit/3,1,U,patients,physical_address,3,"Box 123 - 00100, Nairobi.","<p>Box 123 - 00100, Nairobi.</p>"
+"2025-02-02 18:24:37",/afyaplus/patientsedit/3,1,U,patients,religion,3,Christianity,
+"2025-02-02 20:03:47",/afyaplus/patientsedit/4,1,U,patients,county_id,4,0,33
+"2025-02-02 20:03:47",/afyaplus/patientsedit/4,1,U,patients,subcounty_id,4,0,211
+"2025-02-02 20:03:47",/afyaplus/patientsedit/4,1,U,patients,physical_address,4,"Kilimani, Nairobi.","<p>Kilimani, Nairobi.</p>"
+"2025-02-02 20:03:47",/afyaplus/patientsedit/4,1,U,patients,religion,4,Christianity,

@@ -60,6 +60,8 @@ class Moh204aReport extends DbTable
     public $next_of_kin;
     public $next_of_kin_phone;
     public $registration_month;
+    public $countyName;
+    public $subCounty;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -419,6 +421,52 @@ class Moh204aReport extends DbTable
         $this->registration_month->InputTextType = "text";
         $this->registration_month->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
         $this->Fields['registration_month'] = &$this->registration_month;
+
+        // countyName
+        $this->countyName = new DbField(
+            $this, // Table
+            'x_countyName', // Variable name
+            'countyName', // Name
+            '`countyName`', // Expression
+            '`countyName`', // Basic search expression
+            200, // Type
+            30, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`countyName`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->countyName->InputTextType = "text";
+        $this->countyName->Nullable = false; // NOT NULL field
+        $this->countyName->Required = true; // Required field
+        $this->countyName->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY"];
+        $this->Fields['countyName'] = &$this->countyName;
+
+        // subCounty
+        $this->subCounty = new DbField(
+            $this, // Table
+            'x_subCounty', // Variable name
+            'subCounty', // Name
+            '`subCounty`', // Expression
+            '`subCounty`', // Basic search expression
+            200, // Type
+            30, // Size
+            -1, // Date/Time format
+            false, // Is upload field
+            '`subCounty`', // Virtual expression
+            false, // Is virtual
+            false, // Force selection
+            false, // Is Virtual search
+            'FORMATTED TEXT', // View Tag
+            'TEXT' // Edit Tag
+        );
+        $this->subCounty->InputTextType = "text";
+        $this->subCounty->SearchOperators = ["=", "<>", "IN", "NOT IN", "STARTS WITH", "NOT STARTS WITH", "LIKE", "NOT LIKE", "ENDS WITH", "NOT ENDS WITH", "IS EMPTY", "IS NOT EMPTY", "IS NULL", "IS NOT NULL"];
+        $this->Fields['subCounty'] = &$this->subCounty;
 
         // Add Doctrine Cache
         $this->Cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
@@ -951,6 +999,8 @@ class Moh204aReport extends DbTable
         $this->next_of_kin->DbValue = $row['next_of_kin'];
         $this->next_of_kin_phone->DbValue = $row['next_of_kin_phone'];
         $this->registration_month->DbValue = $row['registration_month'];
+        $this->countyName->DbValue = $row['countyName'];
+        $this->subCounty->DbValue = $row['subCounty'];
     }
 
     // Delete uploaded files
@@ -1316,6 +1366,8 @@ class Moh204aReport extends DbTable
         $this->next_of_kin->setDbValue($row['next_of_kin']);
         $this->next_of_kin_phone->setDbValue($row['next_of_kin_phone']);
         $this->registration_month->setDbValue($row['registration_month']);
+        $this->countyName->setDbValue($row['countyName']);
+        $this->subCounty->setDbValue($row['subCounty']);
     }
 
     // Render list content
@@ -1372,6 +1424,10 @@ class Moh204aReport extends DbTable
 
         // registration_month
 
+        // countyName
+
+        // subCounty
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
 
@@ -1414,6 +1470,12 @@ class Moh204aReport extends DbTable
 
         // registration_month
         $this->registration_month->ViewValue = $this->registration_month->CurrentValue;
+
+        // countyName
+        $this->countyName->ViewValue = $this->countyName->CurrentValue;
+
+        // subCounty
+        $this->subCounty->ViewValue = $this->subCounty->CurrentValue;
 
         // id
         $this->id->HrefValue = "";
@@ -1466,6 +1528,14 @@ class Moh204aReport extends DbTable
         // registration_month
         $this->registration_month->HrefValue = "";
         $this->registration_month->TooltipValue = "";
+
+        // countyName
+        $this->countyName->HrefValue = "";
+        $this->countyName->TooltipValue = "";
+
+        // subCounty
+        $this->subCounty->HrefValue = "";
+        $this->subCounty->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1573,6 +1643,22 @@ class Moh204aReport extends DbTable
         $this->registration_month->EditValue = $this->registration_month->CurrentValue;
         $this->registration_month->PlaceHolder = RemoveHtml($this->registration_month->caption());
 
+        // countyName
+        $this->countyName->setupEditAttributes();
+        if (!$this->countyName->Raw) {
+            $this->countyName->CurrentValue = HtmlDecode($this->countyName->CurrentValue);
+        }
+        $this->countyName->EditValue = $this->countyName->CurrentValue;
+        $this->countyName->PlaceHolder = RemoveHtml($this->countyName->caption());
+
+        // subCounty
+        $this->subCounty->setupEditAttributes();
+        if (!$this->subCounty->Raw) {
+            $this->subCounty->CurrentValue = HtmlDecode($this->subCounty->CurrentValue);
+        }
+        $this->subCounty->EditValue = $this->subCounty->CurrentValue;
+        $this->subCounty->PlaceHolder = RemoveHtml($this->subCounty->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1614,6 +1700,8 @@ class Moh204aReport extends DbTable
                     $doc->exportCaption($this->next_of_kin);
                     $doc->exportCaption($this->next_of_kin_phone);
                     $doc->exportCaption($this->registration_month);
+                    $doc->exportCaption($this->countyName);
+                    $doc->exportCaption($this->subCounty);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->patient_name_moh204a);
@@ -1628,6 +1716,8 @@ class Moh204aReport extends DbTable
                     $doc->exportCaption($this->next_of_kin);
                     $doc->exportCaption($this->next_of_kin_phone);
                     $doc->exportCaption($this->registration_month);
+                    $doc->exportCaption($this->countyName);
+                    $doc->exportCaption($this->subCounty);
                 }
                 $doc->endExportRow();
             }
@@ -1667,6 +1757,8 @@ class Moh204aReport extends DbTable
                         $doc->exportField($this->next_of_kin);
                         $doc->exportField($this->next_of_kin_phone);
                         $doc->exportField($this->registration_month);
+                        $doc->exportField($this->countyName);
+                        $doc->exportField($this->subCounty);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->patient_name_moh204a);
@@ -1681,6 +1773,8 @@ class Moh204aReport extends DbTable
                         $doc->exportField($this->next_of_kin);
                         $doc->exportField($this->next_of_kin_phone);
                         $doc->exportField($this->registration_month);
+                        $doc->exportField($this->countyName);
+                        $doc->exportField($this->subCounty);
                     }
                     $doc->endExportRow($rowCnt);
                 }

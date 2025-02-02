@@ -159,6 +159,8 @@ class Moh204aReportList extends Moh204aReport
         $this->next_of_kin->setVisibility();
         $this->next_of_kin_phone->setVisibility();
         $this->registration_month->Visible = false;
+        $this->countyName->setVisibility();
+        $this->subCounty->setVisibility();
     }
 
     // Constructor
@@ -1068,6 +1070,8 @@ class Moh204aReportList extends Moh204aReport
         $filterList = Concat($filterList, $this->next_of_kin->AdvancedSearch->toJson(), ","); // Field next_of_kin
         $filterList = Concat($filterList, $this->next_of_kin_phone->AdvancedSearch->toJson(), ","); // Field next_of_kin_phone
         $filterList = Concat($filterList, $this->registration_month->AdvancedSearch->toJson(), ","); // Field registration_month
+        $filterList = Concat($filterList, $this->countyName->AdvancedSearch->toJson(), ","); // Field countyName
+        $filterList = Concat($filterList, $this->subCounty->AdvancedSearch->toJson(), ","); // Field subCounty
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1210,6 +1214,22 @@ class Moh204aReportList extends Moh204aReport
         $this->registration_month->AdvancedSearch->SearchValue2 = @$filter["y_registration_month"];
         $this->registration_month->AdvancedSearch->SearchOperator2 = @$filter["w_registration_month"];
         $this->registration_month->AdvancedSearch->save();
+
+        // Field countyName
+        $this->countyName->AdvancedSearch->SearchValue = @$filter["x_countyName"];
+        $this->countyName->AdvancedSearch->SearchOperator = @$filter["z_countyName"];
+        $this->countyName->AdvancedSearch->SearchCondition = @$filter["v_countyName"];
+        $this->countyName->AdvancedSearch->SearchValue2 = @$filter["y_countyName"];
+        $this->countyName->AdvancedSearch->SearchOperator2 = @$filter["w_countyName"];
+        $this->countyName->AdvancedSearch->save();
+
+        // Field subCounty
+        $this->subCounty->AdvancedSearch->SearchValue = @$filter["x_subCounty"];
+        $this->subCounty->AdvancedSearch->SearchOperator = @$filter["z_subCounty"];
+        $this->subCounty->AdvancedSearch->SearchCondition = @$filter["v_subCounty"];
+        $this->subCounty->AdvancedSearch->SearchValue2 = @$filter["y_subCounty"];
+        $this->subCounty->AdvancedSearch->SearchOperator2 = @$filter["w_subCounty"];
+        $this->subCounty->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1257,6 +1277,8 @@ class Moh204aReportList extends Moh204aReport
         $searchFlds[] = &$this->next_of_kin;
         $searchFlds[] = &$this->next_of_kin_phone;
         $searchFlds[] = &$this->registration_month;
+        $searchFlds[] = &$this->countyName;
+        $searchFlds[] = &$this->subCounty;
         $searchKeyword = $default ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
         $searchType = $default ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
 
@@ -1345,6 +1367,8 @@ class Moh204aReportList extends Moh204aReport
             $this->updateSort($this->date_created); // date_created
             $this->updateSort($this->next_of_kin); // next_of_kin
             $this->updateSort($this->next_of_kin_phone); // next_of_kin_phone
+            $this->updateSort($this->countyName); // countyName
+            $this->updateSort($this->subCounty); // subCounty
             $this->setStartRecordNumber(1); // Reset start position
         }
 
@@ -1382,6 +1406,8 @@ class Moh204aReportList extends Moh204aReport
                 $this->next_of_kin->setSort("");
                 $this->next_of_kin_phone->setSort("");
                 $this->registration_month->setSort("");
+                $this->countyName->setSort("");
+                $this->subCounty->setSort("");
             }
 
             // Reset start position
@@ -1549,6 +1575,8 @@ class Moh204aReportList extends Moh204aReport
             $this->createColumnOption($option, "date_created");
             $this->createColumnOption($option, "next_of_kin");
             $this->createColumnOption($option, "next_of_kin_phone");
+            $this->createColumnOption($option, "countyName");
+            $this->createColumnOption($option, "subCounty");
         }
 
         // Set up custom actions
@@ -2000,6 +2028,8 @@ class Moh204aReportList extends Moh204aReport
         $this->next_of_kin->setDbValue($row['next_of_kin']);
         $this->next_of_kin_phone->setDbValue($row['next_of_kin_phone']);
         $this->registration_month->setDbValue($row['registration_month']);
+        $this->countyName->setDbValue($row['countyName']);
+        $this->subCounty->setDbValue($row['subCounty']);
     }
 
     // Return a row with default values
@@ -2019,6 +2049,8 @@ class Moh204aReportList extends Moh204aReport
         $row['next_of_kin'] = $this->next_of_kin->DefaultValue;
         $row['next_of_kin_phone'] = $this->next_of_kin_phone->DefaultValue;
         $row['registration_month'] = $this->registration_month->DefaultValue;
+        $row['countyName'] = $this->countyName->DefaultValue;
+        $row['subCounty'] = $this->subCounty->DefaultValue;
         return $row;
     }
 
@@ -2085,6 +2117,10 @@ class Moh204aReportList extends Moh204aReport
 
         // registration_month
 
+        // countyName
+
+        // subCounty
+
         // View row
         if ($this->RowType == RowType::VIEW) {
             // id
@@ -2130,6 +2166,12 @@ class Moh204aReportList extends Moh204aReport
             // registration_month
             $this->registration_month->ViewValue = $this->registration_month->CurrentValue;
 
+            // countyName
+            $this->countyName->ViewValue = $this->countyName->CurrentValue;
+
+            // subCounty
+            $this->subCounty->ViewValue = $this->subCounty->CurrentValue;
+
             // patient_name_moh204a
             $this->patient_name_moh204a->HrefValue = "";
             $this->patient_name_moh204a->TooltipValue = "";
@@ -2169,6 +2211,14 @@ class Moh204aReportList extends Moh204aReport
             // next_of_kin_phone
             $this->next_of_kin_phone->HrefValue = "";
             $this->next_of_kin_phone->TooltipValue = "";
+
+            // countyName
+            $this->countyName->HrefValue = "";
+            $this->countyName->TooltipValue = "";
+
+            // subCounty
+            $this->subCounty->HrefValue = "";
+            $this->subCounty->TooltipValue = "";
         }
 
         // Call Row Rendered event

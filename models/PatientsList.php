@@ -165,6 +165,8 @@ class PatientsList extends Patients
         $this->gender->setVisibility();
         $this->phone->setVisibility();
         $this->email_address->setVisibility();
+        $this->county_id->setVisibility();
+        $this->subcounty_id->setVisibility();
         $this->physical_address->Visible = false;
         $this->employment_status->Visible = false;
         $this->marital_status->Visible = false;
@@ -734,6 +736,8 @@ class PatientsList extends Patients
 
         // Set up lookup cache
         $this->setupLookupOptions($this->gender);
+        $this->setupLookupOptions($this->county_id);
+        $this->setupLookupOptions($this->subcounty_id);
         $this->setupLookupOptions($this->employment_status);
         $this->setupLookupOptions($this->marital_status);
         $this->setupLookupOptions($this->religion);
@@ -1104,6 +1108,8 @@ class PatientsList extends Patients
         $filterList = Concat($filterList, $this->gender->AdvancedSearch->toJson(), ","); // Field gender
         $filterList = Concat($filterList, $this->phone->AdvancedSearch->toJson(), ","); // Field phone
         $filterList = Concat($filterList, $this->email_address->AdvancedSearch->toJson(), ","); // Field email_address
+        $filterList = Concat($filterList, $this->county_id->AdvancedSearch->toJson(), ","); // Field county_id
+        $filterList = Concat($filterList, $this->subcounty_id->AdvancedSearch->toJson(), ","); // Field subcounty_id
         $filterList = Concat($filterList, $this->physical_address->AdvancedSearch->toJson(), ","); // Field physical_address
         $filterList = Concat($filterList, $this->employment_status->AdvancedSearch->toJson(), ","); // Field employment_status
         $filterList = Concat($filterList, $this->marital_status->AdvancedSearch->toJson(), ","); // Field marital_status
@@ -1231,6 +1237,22 @@ class PatientsList extends Patients
         $this->email_address->AdvancedSearch->SearchValue2 = @$filter["y_email_address"];
         $this->email_address->AdvancedSearch->SearchOperator2 = @$filter["w_email_address"];
         $this->email_address->AdvancedSearch->save();
+
+        // Field county_id
+        $this->county_id->AdvancedSearch->SearchValue = @$filter["x_county_id"];
+        $this->county_id->AdvancedSearch->SearchOperator = @$filter["z_county_id"];
+        $this->county_id->AdvancedSearch->SearchCondition = @$filter["v_county_id"];
+        $this->county_id->AdvancedSearch->SearchValue2 = @$filter["y_county_id"];
+        $this->county_id->AdvancedSearch->SearchOperator2 = @$filter["w_county_id"];
+        $this->county_id->AdvancedSearch->save();
+
+        // Field subcounty_id
+        $this->subcounty_id->AdvancedSearch->SearchValue = @$filter["x_subcounty_id"];
+        $this->subcounty_id->AdvancedSearch->SearchOperator = @$filter["z_subcounty_id"];
+        $this->subcounty_id->AdvancedSearch->SearchCondition = @$filter["v_subcounty_id"];
+        $this->subcounty_id->AdvancedSearch->SearchValue2 = @$filter["y_subcounty_id"];
+        $this->subcounty_id->AdvancedSearch->SearchOperator2 = @$filter["w_subcounty_id"];
+        $this->subcounty_id->AdvancedSearch->save();
 
         // Field physical_address
         $this->physical_address->AdvancedSearch->SearchValue = @$filter["x_physical_address"];
@@ -1438,6 +1460,8 @@ class PatientsList extends Patients
             $this->updateSort($this->gender); // gender
             $this->updateSort($this->phone); // phone
             $this->updateSort($this->email_address); // email_address
+            $this->updateSort($this->county_id); // county_id
+            $this->updateSort($this->subcounty_id); // subcounty_id
             $this->updateSort($this->date_created); // date_created
             $this->setStartRecordNumber(1); // Reset start position
         }
@@ -1473,6 +1497,8 @@ class PatientsList extends Patients
                 $this->gender->setSort("");
                 $this->phone->setSort("");
                 $this->email_address->setSort("");
+                $this->county_id->setSort("");
+                $this->subcounty_id->setSort("");
                 $this->physical_address->setSort("");
                 $this->employment_status->setSort("");
                 $this->marital_status->setSort("");
@@ -1960,6 +1986,8 @@ class PatientsList extends Patients
             $this->createColumnOption($option, "gender");
             $this->createColumnOption($option, "phone");
             $this->createColumnOption($option, "email_address");
+            $this->createColumnOption($option, "county_id");
+            $this->createColumnOption($option, "subcounty_id");
             $this->createColumnOption($option, "date_created");
         }
 
@@ -2413,6 +2441,8 @@ class PatientsList extends Patients
         $this->gender->setDbValue($row['gender']);
         $this->phone->setDbValue($row['phone']);
         $this->email_address->setDbValue($row['email_address']);
+        $this->county_id->setDbValue($row['county_id']);
+        $this->subcounty_id->setDbValue($row['subcounty_id']);
         $this->physical_address->setDbValue($row['physical_address']);
         $this->employment_status->setDbValue($row['employment_status']);
         $this->marital_status->setDbValue($row['marital_status']);
@@ -2439,6 +2469,8 @@ class PatientsList extends Patients
         $row['gender'] = $this->gender->DefaultValue;
         $row['phone'] = $this->phone->DefaultValue;
         $row['email_address'] = $this->email_address->DefaultValue;
+        $row['county_id'] = $this->county_id->DefaultValue;
+        $row['subcounty_id'] = $this->subcounty_id->DefaultValue;
         $row['physical_address'] = $this->physical_address->DefaultValue;
         $row['employment_status'] = $this->employment_status->DefaultValue;
         $row['marital_status'] = $this->marital_status->DefaultValue;
@@ -2510,6 +2542,10 @@ class PatientsList extends Patients
 
         // email_address
 
+        // county_id
+
+        // subcounty_id
+
         // physical_address
 
         // employment_status
@@ -2567,6 +2603,52 @@ class PatientsList extends Patients
 
             // email_address
             $this->email_address->ViewValue = $this->email_address->CurrentValue;
+
+            // county_id
+            $curVal = strval($this->county_id->CurrentValue);
+            if ($curVal != "") {
+                $this->county_id->ViewValue = $this->county_id->lookupCacheOption($curVal);
+                if ($this->county_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->county_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->county_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->county_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->county_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->county_id->ViewValue = $this->county_id->displayValue($arwrk);
+                    } else {
+                        $this->county_id->ViewValue = FormatNumber($this->county_id->CurrentValue, $this->county_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->county_id->ViewValue = null;
+            }
+
+            // subcounty_id
+            $curVal = strval($this->subcounty_id->CurrentValue);
+            if ($curVal != "") {
+                $this->subcounty_id->ViewValue = $this->subcounty_id->lookupCacheOption($curVal);
+                if ($this->subcounty_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = SearchFilter($this->subcounty_id->Lookup->getTable()->Fields["id"]->searchExpression(), "=", $curVal, $this->subcounty_id->Lookup->getTable()->Fields["id"]->searchDataType(), "");
+                    $sqlWrk = $this->subcounty_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $conn = Conn();
+                    $config = $conn->getConfiguration();
+                    $config->setResultCache($this->Cache);
+                    $rswrk = $conn->executeCacheQuery($sqlWrk, [], [], $this->CacheProfile)->fetchAll();
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->subcounty_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->subcounty_id->ViewValue = $this->subcounty_id->displayValue($arwrk);
+                    } else {
+                        $this->subcounty_id->ViewValue = FormatNumber($this->subcounty_id->CurrentValue, $this->subcounty_id->formatPattern());
+                    }
+                }
+            } else {
+                $this->subcounty_id->ViewValue = null;
+            }
 
             // physical_address
             $this->physical_address->ViewValue = $this->physical_address->CurrentValue;
@@ -2660,6 +2742,14 @@ class PatientsList extends Patients
                 $this->email_address->HrefValue = "";
             }
             $this->email_address->TooltipValue = "";
+
+            // county_id
+            $this->county_id->HrefValue = "";
+            $this->county_id->TooltipValue = "";
+
+            // subcounty_id
+            $this->subcounty_id->HrefValue = "";
+            $this->subcounty_id->TooltipValue = "";
 
             // date_created
             $this->date_created->HrefValue = "";
@@ -3245,6 +3335,10 @@ class PatientsList extends Patients
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
                 case "x_gender":
+                    break;
+                case "x_county_id":
+                    break;
+                case "x_subcounty_id":
                     break;
                 case "x_employment_status":
                     break;

@@ -169,8 +169,6 @@ return [
     "radiology_report" => \DI\create(RadiologyReport::class),
     "Radiology_Overview" => \DI\create(RadiologyOverview::class),
     "radiology_overview" => \DI\create(RadiologyOverview::class),
-    "moh204a_report" => \DI\create(Moh204aReport::class),
-    "moh204b_report" => \DI\create(Moh204bReport::class),
     "medicine_dispensation_details" => \DI\create(MedicineDispensationDetails::class),
     "medicine_stock_data" => \DI\create(MedicineStockData::class),
     "pharmacy_billing_report_details" => \DI\create(PharmacyBillingReportDetails::class),
@@ -237,6 +235,11 @@ return [
     "opd_consultation" => \DI\create(OpdConsultation::class),
     "ipd_bed_charges" => \DI\create(IpdBedCharges::class),
     "ipd_total_bed_charges" => \DI\create(IpdTotalBedCharges::class),
+    "beds_status" => \DI\create(BedsStatus::class),
+    "county" => \DI\create(County::class),
+    "sub_county" => \DI\create(SubCounty::class),
+    "moh704a_report" => \DI\create(Moh704aReport::class),
+    "moh704b_report" => \DI\create(Moh704bReport::class),
 
     // User table
     "usertable" => \DI\get("users"),

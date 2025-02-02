@@ -1,0 +1,35 @@
+date/time,script,user,action,table,field,"key value","old value","new value"
+"2025-01-17 13:24:32",/afyaplus/login,6,login,::1,,,,
+"2025-01-17 13:27:53",/afyaplus/logout,6,logout,::1,,,,
+"2025-01-17 13:28:10",/afyaplus/login,2,login,::1,,,,
+"2025-01-17 13:34:56",/afyaplus/patientvisitsadd,2,A,patient_visits,patient_id,17,,9
+"2025-01-17 13:34:56",/afyaplus/patientvisitsadd,2,A,patient_visits,visit_type_id,17,,1
+"2025-01-17 13:34:56",/afyaplus/patientvisitsadd,2,A,patient_visits,payment_method_id,17,,2
+"2025-01-17 13:34:56",/afyaplus/patientvisitsadd,2,A,patient_visits,medical_scheme_id,17,,3
+"2025-01-17 13:34:56",/afyaplus/patientvisitsadd,2,A,patient_visits,user_role,17,,1
+"2025-01-17 13:34:56",/afyaplus/patientvisitsadd,2,A,patient_visits,id,17,,17
+"2025-01-17 13:35:31",/afyaplus/logout,2,logout,::1,,,,
+"2025-01-17 13:35:46",/afyaplus/login,6,login,::1,,,,
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,patient_id,8,,9
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,prescription_id,8,,
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,dispensation_type,8,,Walk-In
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,status,8,,Done
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,created_by_user_id,8,,6
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,visit_id,8,,17
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation,id,8,,8
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,"*** Batch insert begin ***",medicine_dispensation_details,,,,
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_stock_id,8,,2
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,quantity,8,,10
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,medicine_dispensation_id,8,,8
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,A,medicine_dispensation_details,id,8,,8
+"2025-01-17 13:38:16",/afyaplus/medicinedispensationadd,6,"*** Batch insert successful ***",medicine_dispensation_details,,,,
+"2025-01-17 13:46:47",/afyaplus/logout,6,logout,::1,,,,
+"2025-01-17 13:47:04",/afyaplus/login,1,login,::1,,,,
+"2025-01-17 13:47:49",/afyaplus/logout,1,logout,::1,,,,
+"2025-01-17 20:11:08",/afyaplus/login,1,login,::1,,,,
+"2025-01-17 20:19:16",/afyaplus/login,1,login,::1,,,,
+"2025-01-17 20:20:17",/afyaplus/labtestreportsadd,1,A,lab_test_reports,lab_test_request_id,8,,11
+"2025-01-17 20:20:17",/afyaplus/labtestreportsadd,1,A,lab_test_reports,details,8,,
+"2025-01-17 20:20:17",/afyaplus/labtestreportsadd,1,A,lab_test_reports,created_by_user_id,8,,1
+"2025-01-17 20:20:17",/afyaplus/labtestreportsadd,1,A,lab_test_reports,id,8,,8
+"2025-01-17 20:28:03",/afyaplus/logout,1,logout,::1,,,,
